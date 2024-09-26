@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ethers } from 'ethers';
-import { setWallet } from '../actions/walletActions';
+import { setWallet } from '../redux/actions';
 import { encryptSeedPhrase } from '../utils/crypto';
+import { AppDispatch } from '../redux/store';
 
 const WalletSetup: React.FC = () => {
   const [seedPhrase, setSeedPhrase] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const generateWallet = () => {
     const wallet = ethers.Wallet.createRandom();
@@ -32,7 +33,7 @@ const WalletSetup: React.FC = () => {
     try {
       const wallet = ethers.HDNodeWallet.fromMnemonic(ethers.Mnemonic.fromPhrase(seedPhrase));
       const encryptedSeedPhrase = await encryptSeedPhrase(seedPhrase, password);
-      dispatch(setWallet(wallet.address, encryptedSeedPhrase));
+      dispatch(setWalletThunk(wallet.address, encryptedSeedPhrase));
       chrome.storage.local.set({ encryptedSeedPhrase, address: wallet.address }, () => {
         console.log('Wallet stored successfully');
       });
@@ -54,7 +55,7 @@ const WalletSetup: React.FC = () => {
       }
       const wallet = ethers.HDNodeWallet.fromMnemonic(ethers.Mnemonic.fromPhrase(seedPhrase));
       const encryptedSeedPhrase = await encryptSeedPhrase(seedPhrase, password);
-      dispatch(setWallet(wallet.address, encryptedSeedPhrase));
+      dispatch(setWalletThunk(wallet.address, encryptedSeedPhrase));
       chrome.storage.local.set({ encryptedSeedPhrase, address: wallet.address }, () => {
         console.log('Wallet imported successfully');
       });

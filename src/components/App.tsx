@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import WalletSetup from './WalletSetup';
 import { RootState } from '../store';
 import { setWallet } from '../actions/walletActions';
+import { AnyAction } from 'redux';
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
