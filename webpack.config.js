@@ -10,13 +10,10 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
   },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.(ts|tsx)$/,
         use: 'babel-loader',
         exclude: /node_modules/,
       },
@@ -25,5 +22,8 @@ module.exports = {
         use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
     ],
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.css'],
   },
 };
