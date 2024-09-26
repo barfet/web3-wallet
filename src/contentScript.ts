@@ -1,4 +1,4 @@
-console.log('Content script loaded');
+console.log('Content script injected');
 
-// Add content script logic here
+// Add more content script logic here
 export {};

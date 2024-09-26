@@ -1,10 +1,13 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { store } from './store';
 import App from './components/App';
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  <React.StrictMode>
+const Popup = () => (
+  <Provider store={store}>
     <App />
-  </React.StrictMode>
+  </Provider>
 );
+
+ReactDOM.render(<Popup />, document.getElementById('root'));

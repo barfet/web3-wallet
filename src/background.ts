@@ -1,4 +1,4 @@
-console.log('Background script loaded');
+console.log('Background script running');
 
-// Add background script logic here
+// Add more background script logic here
 export {};

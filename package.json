@@ -1,43 +1,27 @@
 {
-    "name": "web3-wallet-chrome-extension",
-    "version": "0.1.0",
-    "description": "A Chrome extension functioning as a Web3 wallet supporting the Ethereum (ETH) network.",
-    "main": "background.ts",
+    "name": "web3-wallet-extension",
+    "version": "1.0.0",
+    "description": "A Web3 wallet Chrome extension",
     "scripts": {
         "build": "webpack --mode production",
-        "dev": "webpack --mode development --watch",
-        "lint": "eslint 'src/**/*.{ts,tsx}'",
-        "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,css}'",
-        "test": "jest"
+        "dev": "webpack --mode development --watch"
     },
-    "keywords": [
-        "Web3",
-        "Ethereum",
-        "Chrome Extension",
-        "Wallet"
-    ],
-    "author": "Your Name",
-    "license": "MIT",
     "dependencies": {
-        "ethers": "^5.7.2",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "react-redux": "^8.0.5",
-        "redux": "^4.2.0"
+        "ethers": "^5.4.0",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-redux": "^7.2.4",
+        "redux": "^4.1.0"
     },
     "devDependencies": {
-        "@types/react": "^18.0.28",
-        "@types/react-dom": "^18.0.11",
-        "@typescript-eslint/eslint-plugin": "^5.57.1",
-        "@typescript-eslint/parser": "^5.57.1",
-        "copy-webpack-plugin": "^11.0.0",
-        "css-loader": "^6.7.3",
-        "eslint": "^8.38.0",
-        "html-webpack-plugin": "^5.5.0",
-        "style-loader": "^3.3.2",
-        "ts-loader": "^9.4.2",
-        "typescript": "^5.0.4",
-        "webpack": "^5.79.0",
-        "webpack-cli": "^5.0.1"
+        "@types/chrome": "^0.0.272",
+        "@types/react": "^17.0.11",
+        "@types/react-dom": "^17.0.7",
+        "@types/react-redux": "^7.1.16",
+        "copy-webpack-plugin": "^9.0.0",
+        "ts-loader": "^9.2.3",
+        "typescript": "^4.3.4",
+        "webpack": "^5.40.0",
+        "webpack-cli": "^4.7.2"
     }
 }
