@@ -1,0 +1,36 @@
+{
+    "manifest_version": 3,
+    "name": "Web3 Wallet",
+    "version": "0.1.0",
+    "description": "A Chrome extension functioning as a Web3 wallet supporting the Ethereum (ETH) network.",
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "assets/icons/icon16.png",
+        "48": "assets/icons/icon48.png",
+        "128": "assets/icons/icon128.png"
+      }
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["contentScript.js"]
+      }
+    ],
+    "permissions": [
+      "storage",
+      "activeTab",
+      "scripting"
+    ],
+    "icons": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    },
+    "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'"
+    }
+  }

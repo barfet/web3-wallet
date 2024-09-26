@@ -1,0 +1,280 @@
+# .cursorrules File for DEX Platform Implementation
+
+You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, Radix UI, Supabase, and Tailwind.
+
+**Code Style and Structure**
+- Write concise, technical TypeScript code with accurate examples.
+- Use functional and declarative programming patterns; avoid classes.
+- Prefer iteration and modularization over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Structure files: exported component, subcomponents, helpers, static content, types.
+
+**Naming Conventions**
+- Use lowercase with dashes for directories (e.g., components/auth-wizard).
+- Favor named exports for components.
+
+**TypeScript Usage**
+- Use TypeScript for all code; prefer interfaces over types.
+- Avoid enums; use maps instead.
+- Use functional components with TypeScript interfaces.
+
+**Syntax and Formatting**
+- Use the "function" keyword for pure functions.
+- Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
+- Use declarative JSX.
+
+**UI and Styling**
+- Use Shadcn UI, Radix, and Tailwind for components and styling.
+- Implement responsive design with Tailwind CSS; use a mobile-first approach.
+
+**Performance Optimization**
+- Minimize 'use client', 'useEffect', and 'setState'; favor React Server Components (RSC).
+- Wrap client components in Suspense with fallback.
+- Use dynamic loading for non-critical components.
+- Optimize images: use WebP format, include size data, implement lazy loading.
+
+**Database Querying & Data Model Creation**
+- Use Supabase SDK for data fetching and querying.
+- For data model creation, use Supabase's schema builder.
+
+**Key Conventions**
+- Use 'nuqs' for URL search parameter state management.
+- Optimize Web Vitals (LCP, CLS, FID).
+- Limit 'use client':
+- Favor server components and Next.js SSR.
+- Use only for Web API access in small components.
+- Avoid for data fetching or state management.
+
+**Follow Next.js docs for Data Fetching, Rendering, and Routing.**
+
+
+## Project Overview
+
+- **Project Name**: Web3 Wallet Chrome Extension
+- **Description**: Develop a Chrome extension that functions as a Web3 wallet supporting the Ethereum (ETH) network, allowing users to manage their ETH assets and interact with decentralized applications (DApps).
+- **References**: Utilize the provided "Product Design" and "Technical Architecture" documents as the primary guides for implementation.
+
+---
+
+## General Guidelines
+
+- **Programming Language**: Use **TypeScript** for all code to ensure type safety and maintainability.
+- **Code Quality**: Write clean, readable, and well-documented code following industry best practices.
+- **Consistency**: Adhere strictly to the project's coding standards and style guides (ESLint and Prettier configurations).
+- **Security First**: Prioritize security in every aspect of the application, following the security considerations outlined.
+
+---
+
+## Technologies and Frameworks
+
+- **Frontend**:
+  - **React**: For building the user interface components.
+  - **Redux**: For state management across the application.
+  - **Ethers.js**: For interacting with the Ethereum blockchain.
+- **Backend (Minimal Use)**:
+  - **Node.js** and **Express.js**: Only if backend services are absolutely necessary.
+- **Build Tools**:
+  - **Webpack**: For bundling the application.
+  - **Babel**: For transpiling modern TypeScript/JavaScript code.
+
+---
+
+## Project Structure
+
+- **Directory Layout**:
+  - **src/**: Main source code directory.
+    - **components/**: Reusable UI components.
+    - **containers/**: Components connected to Redux.
+    - **actions/** and **reducers/**: For Redux actions and reducers.
+    - **utils/**: Utility functions and helpers.
+    - **styles/**: Styling files (CSS or styled-components).
+    - **assets/**: Images, icons, and other assets.
+    - **background/**: Background scripts and service workers.
+    - **content/**: Content scripts injected into web pages.
+- **Entry Points**:
+  - **popup.tsx**: Extension popup UI.
+  - **background.ts**: Background script.
+  - **contentScript.ts**: Content script for DApp interactions.
+- **Configuration Files**:
+  - **tsconfig.json**, **webpack.config.js**, **.eslintrc.js**, **.prettierrc**, **package.json**, **manifest.json**.
+
+---
+
+## Development Guidelines
+
+### 1. Wallet Functionality
+
+- **Wallet Creation**:
+  - Implement secure generation of seed phrases using a cryptographically secure random number generator.
+  - Encrypt seed phrases using AES-256-GCM with keys derived from the user's password via PBKDF2.
+- **Wallet Import**:
+  - Allow users to import existing wallets using standard 12/24-word BIP39 seed phrases.
+- **Private Key Management**:
+  - Never store private keys or seed phrases in plaintext.
+  - Keep all sensitive data encrypted and secure.
+
+### 2. User Interface (UI/UX)
+
+- **Design Principles**:
+  - Create a clean, intuitive, and responsive UI.
+  - Ensure accessibility compliance (WCAG standards).
+- **Components**:
+  - Build reusable React components.
+  - Use functional components with hooks where appropriate.
+- **Styling**:
+  - Use CSS Modules, Styled Components, or a CSS preprocessor for styling.
+
+### 3. State Management
+
+- **Redux Store**:
+  - Set up the Redux store with appropriate middlewares like `redux-thunk` or `redux-saga`.
+- **Actions and Reducers**:
+  - Define clear and concise actions and reducers.
+- **Persisting State**:
+  - Use `redux-persist` to persist state securely.
+  - Ensure persisted state does not expose sensitive information.
+
+### 4. Blockchain Interaction
+
+- **Ethers.js Integration**:
+  - Use Ethers.js for all blockchain interactions.
+  - Handle network requests and responses asynchronously with proper error handling.
+- **Providers**:
+  - Connect to Ethereum nodes via providers like Infura or Alchemy.
+- **Transaction Handling**:
+  - Implement functions to create, sign, and send transactions securely.
+  - Provide real-time transaction status updates to the user.
+
+### 5. DApp Integration
+
+- **Content Script**:
+  - Inject a content script to provide `window.ethereum` to web pages.
+- **Permission Handling**:
+  - Implement a robust permission system for DApp connections.
+  - Allow users to manage permissions and revoke access as needed.
+
+### 6. Security Measures
+
+- **Encryption**:
+  - Use AES-256-GCM for encrypting sensitive data.
+  - Derive encryption keys using PBKDF2 with a unique salt and high iteration count.
+- **Authentication**:
+  - Enforce strong password policies.
+  - Implement biometric authentication where possible using Web Authentication APIs.
+- **Data Protection**:
+  - Store data securely using `chrome.storage.local` or IndexedDB.
+  - Do not log sensitive information.
+- **Content Security Policy (CSP)**:
+  - Define a strict CSP in the manifest file to prevent XSS attacks.
+
+### 7. Extension Manifest
+
+- **Manifest Version**:
+  - Use **Manifest V3** for the Chrome extension.
+- **Permissions**:
+  - Request only the necessary permissions required for functionality.
+- **Background Scripts**:
+  - Implement background processes using service workers as per Manifest V3 guidelines.
+
+### 8. Error Handling and Logging
+
+- **Error Handling**:
+  - Implement comprehensive error handling throughout the application.
+  - Provide user-friendly error messages.
+- **Logging**:
+  - Use a logging framework that respects user privacy.
+  - Do not log sensitive data.
+
+### 9. Testing
+
+- **Unit Testing**:
+  - Write unit tests for all components and functions using Jest.
+- **Integration Testing**:
+  - Test interactions between components and with the blockchain.
+- **Security Testing**:
+  - Regularly perform security audits and vulnerability scanning.
+- **Automated Testing**:
+  - Set up continuous integration pipelines to run tests on each commit.
+
+### 10. Performance Optimization
+
+- **Code Splitting**:
+  - Implement lazy loading to reduce initial load times.
+- **Minification**:
+  - Minify and uglify production code to reduce bundle size.
+- **Resource Optimization**:
+  - Optimize images and other assets.
+
+### 11. Documentation
+
+- **Code Comments**:
+  - Document complex logic and public functions.
+- **README and Guides**:
+  - Maintain up-to-date documentation for setting up and contributing to the project.
+
+### 12. Internationalization (i18n)
+
+- **Preparation for Localization**:
+  - Externalize all user-facing strings.
+  - Use a library like `react-i18next` for internationalization support.
+
+### 13. Collaboration Practices
+
+- **Version Control**:
+  - Commit changes frequently with meaningful commit messages.
+- **Branching Strategy**:
+  - Use GitFlow or a similar branching strategy.
+- **Code Reviews**:
+  - All code must be reviewed before merging into the main branch.
+
+---
+
+## Prohibited Practices
+
+- **Hardcoding Sensitive Data**:
+  - Do not hardcode private keys, seed phrases, passwords, or any sensitive information.
+- **Insecure Dependencies**:
+  - Do not use deprecated or unmaintained libraries.
+- **Ignoring Security Protocols**:
+  - Do not bypass security measures for convenience.
+- **Unauthorized Network Calls**:
+  - Do not make network requests to untrusted sources.
+- **Data Privacy Violations**:
+  - Do not collect or transmit user data without explicit consent.
+
+---
+
+## Compliance and Legal
+
+- **Licensing**:
+  - Ensure all third-party libraries are used in compliance with their licenses.
+- **Privacy Policy**:
+  - Ensure that the application complies with data protection regulations like GDPR.
+- **User Consent**:
+  - Obtain necessary permissions and consents from users for data usage.
+
+---
+
+## Deployment Guidelines
+
+- **Build Configuration**:
+  - Ensure the production build is optimized and free from development artifacts.
+- **Testing Before Release**:
+  - Thoroughly test the extension before packaging for the Chrome Web Store.
+- **Compliance with Store Policies**:
+  - Verify that the extension meets all Chrome Web Store requirements.
+- **Versioning**:
+  - Use semantic versioning for all releases.
+
+---
+
+## Final Notes
+
+- **Focus on User Experience**:
+  - Always keep the end-user experience in mind when making development decisions.
+- **Stay Aligned with Project Goals**:
+  - Regularly refer back to the "Product Design" and "Technical Architecture" documents to ensure alignment.
+- **Continuous Improvement**:
+  - Be open to feedback and ready to iterate on implementations for better performance and usability.
+
+---

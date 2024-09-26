@@ -1,0 +1,44 @@
+{
+    "name": "web3-wallet-chrome-extension",
+    "version": "0.1.0",
+    "description": "A Chrome extension functioning as a Web3 wallet supporting the Ethereum (ETH) network.",
+    "main": "background.ts",
+    "scripts": {
+      "build": "webpack --mode production",
+      "dev": "webpack --mode development --watch",
+      "lint": "eslint 'src/**/*.{ts,tsx}'",
+      "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,css}'",
+      "test": "jest"
+    },
+    "keywords": [
+      "Web3",
+      "Ethereum",
+      "Chrome Extension",
+      "Wallet"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "redux": "^4.2.0",
+      "react-redux": "^8.0.5",
+      "ethers": "^5.7.2",
+      "shadcn-ui": "^0.9.0",
+      "radix-ui": "^1.0.0",
+      "supabase": "^1.2.0",
+      "tailwindcss": "^3.3.1"
+    },
+    "devDependencies": {
+      "@types/react": "^18.0.28",
+      "@types/react-dom": "^18.0.11",
+      "typescript": "^4.9.5",
+      "webpack": "^5.75.0",
+      "webpack-cli": "^4.10.0",
+      "babel-loader": "^9.1.0",
+      "eslint": "^8.29.0",
+      "prettier": "^2.8.8",
+      "jest": "^29.4.3",
+      "@types/jest": "^29.2.4"
+    }
+  }
