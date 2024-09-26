@@ -1,3 +1,4 @@
-console.log('Background service worker running');
+console.log('Background script loaded');
 
 // Add background script logic here
+export {};
