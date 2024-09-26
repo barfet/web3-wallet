@@ -13,7 +13,11 @@ const WalletSetup: React.FC = () => {
 
   const generateWallet = () => {
     const wallet = ethers.Wallet.createRandom();
-    setSeedPhrase(wallet.mnemonic.phrase);
+    if (wallet.mnemonic) {
+      setSeedPhrase(wallet.mnemonic.phrase);
+    } else {
+      setError("Failed to generate wallet with mnemonic");
+    }
   };
 
   const createWallet = async () => {
@@ -26,7 +30,7 @@ const WalletSetup: React.FC = () => {
       return;
     }
     try {
-      const wallet = ethers.Wallet.fromMnemonic(seedPhrase);
+      const wallet = ethers.HDNodeWallet.fromMnemonic(ethers.Mnemonic.fromPhrase(seedPhrase));
       const encryptedSeedPhrase = await encryptSeedPhrase(seedPhrase, password);
       dispatch(setWallet(wallet.address, encryptedSeedPhrase));
       chrome.storage.local.set({ encryptedSeedPhrase, address: wallet.address }, () => {
@@ -43,8 +47,12 @@ const WalletSetup: React.FC = () => {
 
   const importWallet = async () => {
     try {
-      ethers.utils.mnemonicToEntropy(seedPhrase);
-      const wallet = ethers.Wallet.fromMnemonic(seedPhrase);
+      const isValid = ethers.Mnemonic.isValidMnemonic(seedPhrase);
+      if (!isValid) {
+        setError('Invalid seed phrase');
+        return;
+      }
+      const wallet = ethers.HDNodeWallet.fromMnemonic(ethers.Mnemonic.fromPhrase(seedPhrase));
       const encryptedSeedPhrase = await encryptSeedPhrase(seedPhrase, password);
       dispatch(setWallet(wallet.address, encryptedSeedPhrase));
       chrome.storage.local.set({ encryptedSeedPhrase, address: wallet.address }, () => {

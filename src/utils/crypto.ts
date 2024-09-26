@@ -1,11 +1,16 @@
 import { ethers } from 'ethers';
 
-export const encryptSeedPhrase = async (seedPhrase: string, password: string): Promise<string> => {
-  const wallet = ethers.Wallet.fromMnemonic(seedPhrase);
-  return await wallet.encrypt(password);
-};
+export function generateWallet(): ethers.HDNodeWallet {
+  const wallet = ethers.Wallet.createRandom();
+  return wallet;
+}
 
-export const decryptSeedPhrase = async (encryptedJson: string, password: string): Promise<string> => {
-  const wallet = await ethers.Wallet.fromEncryptedJson(encryptedJson, password);
-  return wallet.mnemonic.phrase;
-};
+export function getAddressFromMnemonic(mnemonic: string): string {
+  const wallet = ethers.HDNodeWallet.fromMnemonic(ethers.Mnemonic.fromPhrase(mnemonic));
+  return wallet.address;
+}
+
+export async function encryptSeedPhrase(seedPhrase: string, password: string): Promise<string> {
+  const wallet = ethers.Wallet.fromPhrase(seedPhrase);
+  return wallet.encrypt(password);
+}
