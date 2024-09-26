@@ -45,7 +45,7 @@ describe('WalletSetup Integration', () => {
       address: '0x1234567890123456789012345678901234567890',
     };
     (ethers.Wallet.createRandom as jest.Mock).mockReturnValue(mockWallet);
-    (ethers.Wallet.fromMnemonic as jest.Mock).mockReturnValue(mockWallet);
+    (ethers.HDNodeWallet.fromMnemonic as jest.Mock).mockReturnValue(mockWallet);
 
     const { getByText, getByPlaceholderText } = render(
       <Provider store={store}>
@@ -76,7 +76,7 @@ describe('WalletSetup Integration', () => {
       mnemonic: { phrase: 'test seed phrase' },
       address: '0x1234567890123456789012345678901234567890',
     };
-    (ethers.Wallet.fromMnemonic as jest.Mock).mockReturnValue(mockWallet);
+    (ethers.HDNodeWallet.fromMnemonic as jest.Mock).mockReturnValue(mockWallet);
 
     const { getByText, getByPlaceholderText } = render(
       <Provider store={store}>

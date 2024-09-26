@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ethers } from 'ethers';
-import { setWallet } from '../redux/actions';
+import { setWallet, setWalletThunk } from '../redux/actions';
 import { encryptSeedPhrase } from '../utils/crypto';
-import { AppDispatch } from '../redux/store';
+import { AppDispatch } from '../store';
 
 const WalletSetup: React.FC = () => {
   const [seedPhrase, setSeedPhrase] = useState<string>('');

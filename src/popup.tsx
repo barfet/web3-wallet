@@ -1,14 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { store } from './redux/store';
-import App from './components/App';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const Popup: React.FC = () => {
+  return (
+    <div>
+      <h1>Web3 Wallet Extension</h1>
+      <p>Welcome to your Web3 wallet!</p>
+    </div>
+  );
+};
+
+ReactDOM.render(<Popup />, document.getElementById('root'));

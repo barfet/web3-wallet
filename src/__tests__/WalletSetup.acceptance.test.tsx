@@ -61,7 +61,7 @@ describe('Wallet Setup Acceptance Tests', () => {
       address: '0x1234567890123456789012345678901234567890',
     };
     (ethers.Wallet.createRandom as jest.Mock).mockReturnValue(mockWallet);
-    (ethers.Wallet.fromMnemonic as jest.Mock).mockReturnValue(mockWallet);
+    (ethers.HDNodeWallet.fromMnemonic as jest.Mock).mockReturnValue(mockWallet);
 
     const { getByText, getByPlaceholderText } = render(
       <Provider store={store}>
@@ -88,7 +88,7 @@ describe('Wallet Setup Acceptance Tests', () => {
       mnemonic: { phrase: 'test seed phrase' },
       address: '0x1234567890123456789012345678901234567890',
     };
-    (ethers.Wallet.fromMnemonic as jest.Mock).mockReturnValue(mockWallet);
+    (ethers.HDNodeWallet.fromMnemonic as jest.Mock).mockReturnValue(mockWallet);
 
     const { getByText, getByPlaceholderText } = render(
       <Provider store={store}>
@@ -111,7 +111,7 @@ describe('Wallet Setup Acceptance Tests', () => {
   });
 
   test('User sees an error for invalid seed phrase', async () => {
-    (ethers.utils.mnemonicToEntropy as jest.Mock).mockImplementation(() => {
+    (ethers.Mnemonic.fromPhrase as jest.Mock).mockImplementation(() => {
       throw new Error('Invalid mnemonic');
     });
 

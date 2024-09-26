@@ -4,11 +4,12 @@ import WalletSetup from './WalletSetup';
 import { RootState } from '../store';
 import { setWallet } from '../actions/walletActions';
 import { AnyAction } from 'redux';
+import { AppDispatch } from '../store'; // Adjust the import path as needed
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const wallet = useSelector((state: RootState) => state.wallet);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     chrome.storage.local.get(['address', 'encryptedSeedPhrase'], (result: { address?: string; encryptedSeedPhrase?: string }) => {
