@@ -1,6 +1,7 @@
 import { Action } from 'redux';
 
 export interface SetWalletAction extends Action<'SET_WALLET'> {
+  type: 'SET_WALLET';
   payload: {
     address: string;
     encryptedSeedPhrase: string;

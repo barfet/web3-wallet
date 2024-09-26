@@ -1,25 +1,38 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { createStore, combineReducers } from 'redux';
+import { configureStore } from '@reduxjs/toolkit';
+import rootReducer from '../redux/reducers';
 import App from '../components/App';
-import { walletReducer } from '../reducers/walletReducer';
 import { ethers } from 'ethers';
 
-jest.mock('ethers');
+jest.mock('ethers', () => ({
+  Wallet: {
+    createRandom: jest.fn().mockReturnValue({
+      mnemonic: { phrase: 'test seed phrase' },
+      address: '0x1234567890123456789012345678901234567890',
+    }),
+  },
+  HDNodeWallet: {
+    fromMnemonic: jest.fn().mockReturnValue({
+      address: '0x1234567890123456789012345678901234567890',
+    }),
+  },
+  Mnemonic: {
+    fromPhrase: jest.fn().mockReturnValue({}),
+    isValidMnemonic: jest.fn().mockReturnValue(true),
+  },
+}));
+
 jest.mock('../utils/crypto', () => ({
   encryptSeedPhrase: jest.fn().mockResolvedValue('encrypted_seed_phrase'),
 }));
 
-const rootReducer = combineReducers({
-  wallet: walletReducer,
-});
-
 describe('Wallet Setup Acceptance Tests', () => {
-  let store;
+  let store: ReturnType<typeof configureStore>;
 
   beforeEach(() => {
-    store = createStore(rootReducer);
+    store = configureStore({ reducer: rootReducer });
     const mockChromeStorage = {
       local: {
         get: jest.fn(),
@@ -28,10 +41,18 @@ describe('Wallet Setup Acceptance Tests', () => {
         clear: jest.fn(),
         remove: jest.fn(),
       },
+      sync: {},
+      managed: {},
+      session: {},
+      onChanged: {
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        hasListeners: jest.fn(),
+      },
     };
     global.chrome = {
       storage: mockChromeStorage,
-    };
+    } as unknown as typeof chrome;
   });
 
   test('User can create a new wallet', async () => {

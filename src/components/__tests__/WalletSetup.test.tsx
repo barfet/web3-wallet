@@ -1,23 +1,34 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import configureStore from 'redux-mock-store';
+import { configureStore } from '@reduxjs/toolkit';
+import rootReducer from '../../redux/reducers';
 import WalletSetup from '../WalletSetup';
 import { ethers } from 'ethers';
 
-jest.mock('ethers');
-jest.mock('../../utils/crypto', () => ({
-  encryptSeedPhrase: jest.fn().mockResolvedValue('encrypted_seed_phrase'),
+jest.mock('ethers', () => ({
+  Wallet: {
+    createRandom: jest.fn().mockReturnValue({
+      mnemonic: { phrase: 'test seed phrase' },
+      address: '0x1234567890123456789012345678901234567890',
+    }),
+  },
+  HDNodeWallet: {
+    fromMnemonic: jest.fn().mockReturnValue({
+      address: '0x1234567890123456789012345678901234567890',
+    }),
+  },
+  Mnemonic: {
+    fromPhrase: jest.fn().mockReturnValue({}),
+    isValidMnemonic: jest.fn().mockReturnValue(true),
+  },
 }));
 
-const mockStore = configureStore([]);
-
 describe('WalletSetup Component', () => {
-  let store;
+  let store: ReturnType<typeof configureStore>;
 
   beforeEach(() => {
-    store = mockStore({});
-    store.dispatch = jest.fn();
+    store = configureStore({ reducer: rootReducer });
   });
 
   test('renders wallet setup form', () => {

@@ -3,25 +3,38 @@ import { render, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import rootReducer from '../../redux/reducers';
-import thunk from 'redux-thunk';
 import WalletSetup from '../WalletSetup';
 import { ethers } from 'ethers';
 
-jest.mock('ethers');
+jest.mock('ethers', () => ({
+  Wallet: {
+    createRandom: jest.fn().mockReturnValue({
+      mnemonic: { phrase: 'test seed phrase' },
+      address: '0x1234567890123456789012345678901234567890',
+    }),
+  },
+  HDNodeWallet: {
+    fromMnemonic: jest.fn().mockReturnValue({
+      address: '0x1234567890123456789012345678901234567890',
+    }),
+  },
+  Mnemonic: {
+    fromPhrase: jest.fn().mockReturnValue({}),
+    isValidMnemonic: jest.fn().mockReturnValue(true),
+  },
+}));
+
 jest.mock('../../utils/crypto', () => ({
   encryptSeedPhrase: jest.fn().mockResolvedValue('encrypted_seed_phrase'),
 }));
 
-const middlewares = [thunk];
-const mockStore = configureStore(middlewares);
-
 describe('WalletSetup Integration', () => {
-  let store;
+  let store: ReturnType<typeof configureStore>;
 
   beforeEach(() => {
     store = configureStore({
       reducer: rootReducer,
-      middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
     });
     store.dispatch = jest.fn();
   });
