@@ -1,39 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import WalletSetup from './WalletSetup';
 import { RootState } from '../store';
+import { setWallet } from '../actions/walletActions';
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const wallet = useSelector((state: RootState) => state.wallet);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     chrome.storage.local.get(['address', 'encryptedSeedPhrase'], (result: { address?: string; encryptedSeedPhrase?: string }) => {
       if (result.address && result.encryptedSeedPhrase) {
-        store.dispatch({
-          type: 'SET_WALLET',
-          payload: { address: result.address, encryptedSeedPhrase: result.encryptedSeedPhrase }
-        });
+        dispatch(setWallet(result.address, result.encryptedSeedPhrase));
       }
       setIsLoading(false);
     });
-  }, []);
+  }, [dispatch]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="container">Loading...</div>;
   }
 
   return (
     <div>
-      <h1>Web3 Wallet</h1>
-      {!wallet.address ? (
-        <WalletSetup />
-      ) : (
-        <div>
-          <p>Wallet Address: {wallet.address}</p>
-          {/* Add more wallet management components here */}
-        </div>
-      )}
+      <div className="header">Web3 Wallet</div>
+      <div className="container">
+        {!wallet.address ? (
+          <WalletSetup />
+        ) : (
+          <div>
+            <div className="wallet-address">
+              <strong>Wallet Address:</strong><br />
+              {wallet.address}
+            </div>
+            {/* Add more wallet management components here */}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -27,6 +27,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: 'public', to: '.' },
+        { from: 'src/styles/global.css', to: 'global.css' },
       ],
     }),
   ],

@@ -43,7 +43,7 @@ const WalletSetup: React.FC = () => {
 
   const importWallet = async () => {
     try {
-      ethers.utils.mnemonicToEntropy(seedPhrase); // This will throw an error if the seed phrase is invalid
+      ethers.utils.mnemonicToEntropy(seedPhrase);
       const wallet = ethers.Wallet.fromMnemonic(seedPhrase);
       const encryptedSeedPhrase = await encryptSeedPhrase(seedPhrase, password);
       dispatch(setWallet(wallet.address, encryptedSeedPhrase));
@@ -62,7 +62,7 @@ const WalletSetup: React.FC = () => {
   return (
     <div>
       <h2>Wallet Setup</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="error">{error}</p>}
       <button onClick={generateWallet}>Generate New Wallet</button>
       <textarea 
         value={seedPhrase} 
