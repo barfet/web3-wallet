@@ -3,7 +3,7 @@ import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { WalletSetup } from '@/components/WalletSetup';
 import * as cryptoUtils from '@/utils/cryptoUtils';
-import { ethers } from 'ethers';
+import { Wallet } from 'ethers';
 
 // Mock chrome.storage.local
 const mockChromeStorage = {
@@ -19,6 +19,19 @@ global.chrome = {
 jest.mock('@/utils/cryptoUtils', () => ({
   generateSeedPhrase: jest.fn(),
   encryptSeedPhrase: jest.fn(),
+  isValidSeedPhrase: jest.fn(),
+}));
+
+// Mock ethers Wallet
+jest.mock('ethers', () => ({
+  Wallet: {
+    createRandom: jest.fn(() => ({
+      mnemonic: { phrase: 'test seed phrase' },
+    })),
+    fromPhrase: jest.fn(() => ({
+      address: '0x1234567890123456789012345678901234567890',
+    })),
+  },
 }));
 
 describe('WalletSetup', () => {
@@ -38,16 +51,20 @@ describe('WalletSetup', () => {
     test('generateSeedPhrase is called when creating a new wallet', async () => {
       const mockSeedPhrase = 'test seed phrase';
       (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue(mockSeedPhrase);
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       render(<WalletSetup />);
       fireEvent.click(screen.getByText('Create New Wallet'));
       await waitFor(() => {
         expect(cryptoUtils.generateSeedPhrase).toHaveBeenCalled();
+        expect(screen.getByText('Your Seed Phrase')).toBeInTheDocument();
+        expect(screen.getByText(mockSeedPhrase)).toBeInTheDocument();
       });
     });
 
     test('displays SeedPhraseDisplay component after wallet creation', async () => {
       const mockSeedPhrase = 'test seed phrase';
       (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue(mockSeedPhrase);
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       render(<WalletSetup />);
       fireEvent.click(screen.getByText('Create New Wallet'));
       await waitFor(() => {
@@ -62,6 +79,7 @@ describe('WalletSetup', () => {
     test('completes wallet creation flow', async () => {
       const mockSeedPhrase = 'test seed phrase';
       (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue(mockSeedPhrase);
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       (cryptoUtils.encryptSeedPhrase as jest.Mock).mockResolvedValue('encrypted_seed_phrase');
       
       render(<WalletSetup />);
@@ -99,6 +117,7 @@ describe('WalletSetup', () => {
 
     test('handles wallet import flow', async () => {
       const mockSeedPhrase = 'valid seed phrase for import';
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       render(<WalletSetup />);
       
       // Navigate to import wallet
@@ -128,6 +147,7 @@ describe('WalletSetup', () => {
     test('User can create a new wallet', async () => {
       const mockSeedPhrase = 'test seed phrase';
       (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue(mockSeedPhrase);
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       (cryptoUtils.encryptSeedPhrase as jest.Mock).mockResolvedValue('encrypted_seed_phrase');
       
       render(<WalletSetup />);
@@ -174,6 +194,7 @@ describe('WalletSetup', () => {
 
     test('User can import an existing wallet', async () => {
       const mockSeedPhrase = 'valid test seed phrase for import';
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       render(<WalletSetup />);
       
       // User clicks "Import Existing Wallet"

@@ -3,37 +3,40 @@
 /// <reference types="chrome"/>
 
 import React, { useState } from 'react';
-import { ethers } from 'ethers';
+import { ethers, HDNodeWallet } from 'ethers';
 import { WelcomePage } from './WelcomePage';
 import { SeedPhraseDisplay } from './SeedPhraseDisplay';
 import { SeedPhraseConfirmation } from './SeedPhraseConfirmation';
 import { PasswordSetup } from './PasswordSetup';
-import { encryptSeedPhrase, generateSeedPhrase } from '@/utils/cryptoUtils';
-import { HDNodeWallet } from 'ethers';
+import { encryptSeedPhrase, generateSeedPhrase, isValidSeedPhrase } from '@/utils/cryptoUtils';
+import { Wallet } from 'ethers';
 
 export function WalletSetup() {
   const [step, setStep] = useState<'welcome' | 'seedPhrase' | 'confirmation' | 'password'>('welcome');
   const [seedPhrase, setSeedPhrase] = useState<string>('');
   const [wallet, setWallet] = useState<HDNodeWallet | null>(null);
 
-  const handleCreateWallet = async () => {
+  const handleCreateWallet = () => {
     const newSeedPhrase = generateSeedPhrase();
     setSeedPhrase(newSeedPhrase);
-    const mnemonic = ethers.Mnemonic.fromPhrase(newSeedPhrase);
-    const newWallet = ethers.HDNodeWallet.fromMnemonic(mnemonic);
-    setWallet(newWallet);
-    setStep('seedPhrase');
+    if (isValidSeedPhrase(newSeedPhrase)) {
+      const newWallet = Wallet.fromPhrase(newSeedPhrase);
+      setWallet(newWallet);
+      setStep('seedPhrase');
+    } else {
+      console.error('Generated invalid seed phrase');
+      // Handle error (e.g., show error message to user)
+    }
   };
 
   const handleImportWallet = (importedSeedPhrase: string) => {
-    try {
-      const mnemonic = ethers.Mnemonic.fromPhrase(importedSeedPhrase);
-      const importedWallet = ethers.HDNodeWallet.fromMnemonic(mnemonic);
+    if (isValidSeedPhrase(importedSeedPhrase)) {
+      const importedWallet = Wallet.fromPhrase(importedSeedPhrase);
       setSeedPhrase(importedSeedPhrase);
       setWallet(importedWallet);
       setStep('password');
-    } catch (error) {
-      console.error('Invalid seed phrase:', error);
+    } else {
+      console.error('Invalid seed phrase');
       // Handle error (e.g., show error message to user)
     }
   };
