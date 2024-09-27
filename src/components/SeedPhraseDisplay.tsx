@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -10,11 +12,12 @@ interface SeedPhraseDisplayProps {
 
 export function SeedPhraseDisplay({ seedPhrase, onNext }: SeedPhraseDisplayProps) {
   const [showPhrase, setShowPhrase] = useState(false)
+  const [localSeedPhrase, setLocalSeedPhrase] = useState(seedPhrase)
 
   useEffect(() => {
     // In a real implementation, generate the seed phrase here
     // For this example, we'll use a dummy phrase
-    setSeedPhrase("apple banana cherry date elderberry fig grape honeydew imbe jackfruit kiwi lemon")
+    setLocalSeedPhrase("apple banana cherry date elderberry fig grape honeydew imbe jackfruit kiwi lemon")
   }, [])
 
   return (
@@ -28,7 +31,7 @@ export function SeedPhraseDisplay({ seedPhrase, onNext }: SeedPhraseDisplayProps
       </Alert>
       <div className="p-4 bg-gray-100 rounded-md">
         {showPhrase ? (
-          <p className="text-center break-all">{seedPhrase}</p>
+          <p className="text-center break-all">{localSeedPhrase}</p>
         ) : (
           <Button onClick={() => setShowPhrase(true)} className="w-full">
             Reveal Seed Phrase

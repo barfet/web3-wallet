@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { WelcomePage } from './WelcomePage'
@@ -15,7 +17,7 @@ export function WalletSetup() {
 
   const steps = [
     <WelcomePage key="welcome" onNext={nextStep} />,
-    <PasswordSetup key="password" onNext={(pass) => { setPassword(pass); nextStep(); }} />,
+    <PasswordSetup key="password" onNext={(pass: string) => { setPassword(pass); nextStep(); }} />,
     <SeedPhraseDisplay key="seedphrase" seedPhrase={seedPhrase} onNext={nextStep} />,
     <SeedPhraseConfirmation key="confirm" seedPhrase={seedPhrase} onComplete={() => console.log('Wallet setup complete')} />
   ]

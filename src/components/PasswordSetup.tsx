@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,7 +35,7 @@ export function PasswordSetup({ onNext }: PasswordSetupProps) {
           id="password"
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
           required
         />
       </div>
@@ -43,7 +45,7 @@ export function PasswordSetup({ onNext }: PasswordSetupProps) {
           id="confirmPassword"
           type="password"
           value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
           required
         />
       </div>

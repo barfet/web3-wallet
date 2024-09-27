@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -45,7 +47,7 @@ export function SeedPhraseConfirmation({ seedPhrase, onComplete }: SeedPhraseCon
           <Input
             id={`word-${i}`}
             value={words[i]}
-            onChange={(e) => setWords(words.map((w, j) => i === j ? e.target.value : w))}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWords(words.map((w, j) => i === j ? e.target.value : w))}
             required
           />
         </div>
