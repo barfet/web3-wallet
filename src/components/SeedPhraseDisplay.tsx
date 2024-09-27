@@ -22,7 +22,7 @@ export function SeedPhraseDisplay({ seedPhrase, onNext }: SeedPhraseDisplayProps
 
   return (
     <div className="space-y-4">
-      <Alert variant="warning">
+      <Alert>
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>Warning</AlertTitle>
         <AlertDescription>
@@ -40,7 +40,7 @@ export function SeedPhraseDisplay({ seedPhrase, onNext }: SeedPhraseDisplayProps
       </div>
       {showPhrase && (
         <Button onClick={onNext} className="w-full">
-          I've Securely Saved My Seed Phrase
+          I&apos;ve Securely Saved My Seed Phrase
         </Button>
       )}
     </div>

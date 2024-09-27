@@ -9,15 +9,13 @@ import { SeedPhraseConfirmation } from './SeedPhraseConfirmation'
 
 export function WalletSetup() {
   const [step, setStep] = useState(0)
-  const [password, setPassword] = useState('')
   const [seedPhrase, setSeedPhrase] = useState('')
 
   const nextStep = () => setStep(step + 1)
-  const prevStep = () => setStep(step - 1)
 
   const steps = [
     <WelcomePage key="welcome" onNext={nextStep} />,
-    <PasswordSetup key="password" onNext={(pass: string) => { setPassword(pass); nextStep(); }} />,
+    <PasswordSetup key="password" onNext={(pass: string) => { nextStep(); }} />,
     <SeedPhraseDisplay key="seedphrase" seedPhrase={seedPhrase} onNext={nextStep} />,
     <SeedPhraseConfirmation key="confirm" seedPhrase={seedPhrase} onComplete={() => console.log('Wallet setup complete')} />
   ]
