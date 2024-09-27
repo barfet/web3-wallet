@@ -1,9 +1,16 @@
-import { WalletSetup } from '@/components/WalletSetup';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+import '../styles/globals.css';
 
-export default function Home() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-      <WalletSetup />
-    </div>
+const container = document.getElementById('root');
+if (container) {
+  const root = createRoot(container);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
   );
+} else {
+  console.error('Root element not found');
 }
