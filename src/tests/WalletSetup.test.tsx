@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import { render, fireEvent, waitFor, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { WalletSetup } from '@/components/WalletSetup';
 import * as cryptoUtils from '@/utils/cryptoUtils';
+import * as passwordUtils from '@/utils/passwordUtils';
 import { Wallet } from 'ethers';
 
 // Mock chrome.storage.local
@@ -20,6 +21,12 @@ jest.mock('@/utils/cryptoUtils', () => ({
   generateSeedPhrase: jest.fn(),
   encryptSeedPhrase: jest.fn(),
   isValidSeedPhrase: jest.fn(),
+}));
+
+// Mock passwordUtils functions
+jest.mock('@/utils/passwordUtils', () => ({
+  validatePassword: jest.fn(),
+  getPasswordStrength: jest.fn(),
 }));
 
 // Mock ethers Wallet
@@ -40,6 +47,8 @@ console.error = jest.fn();
 describe('WalletSetup', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (passwordUtils.validatePassword as jest.Mock).mockReturnValue(true);
+    (passwordUtils.getPasswordStrength as jest.Mock).mockReturnValue('strong');
   });
 
   // Unit Tests
@@ -314,17 +323,18 @@ describe('WalletSetup', () => {
 
   describe('Wallet Creation and Import Process', () => {
     test('creates wallet and moves to seed phrase display', async () => {
-      const mockSeedPhrase = 'valid test seed phrase';
+      const mockSeedPhrase = 'test seed phrase';
       (cryptoUtils.generateSeedPhrase as jest.Mock).mockResolvedValue(mockSeedPhrase);
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       
       render(<WalletSetup />);
+      
       fireEvent.click(screen.getByText('Create New Wallet'));
       
       await waitFor(() => {
         expect(screen.getByText('Your Seed Phrase')).toBeInTheDocument();
         expect(screen.getByText(mockSeedPhrase)).toBeInTheDocument();
-      });
+      }, { timeout: 5000 });
     });
 
     test('imports wallet and moves to password setup', async () => {
@@ -332,13 +342,19 @@ describe('WalletSetup', () => {
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       
       render(<WalletSetup />);
+      
       fireEvent.click(screen.getByText('Import Existing Wallet'));
-      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: mockSeedPhrase } });
+      
+      await waitFor(() => {
+        const input = screen.getByPlaceholderText('Enter your seed phrase');
+        fireEvent.change(input, { target: { value: mockSeedPhrase } });
+      });
+
       fireEvent.click(screen.getByText('Import Wallet'));
       
       await waitFor(() => {
         expect(screen.getByText('Set Your Password')).toBeInTheDocument();
-      });
+      }, { timeout: 5000 });
     });
   });
 

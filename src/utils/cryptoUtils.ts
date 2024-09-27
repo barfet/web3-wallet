@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import { AES, enc } from 'crypto-js';
 import { Wallet } from 'ethers';
 
 // New imports for Web Crypto API

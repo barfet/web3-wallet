@@ -2,7 +2,7 @@
 
 /// <reference types="chrome"/>
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ethers, HDNodeWallet } from 'ethers';
 import { WelcomePage } from './WelcomePage';
 import { SeedPhraseDisplay } from './SeedPhraseDisplay';
@@ -16,21 +16,20 @@ export function WalletSetup() {
   const [seedPhrase, setSeedPhrase] = useState<string>('');
   const [wallet, setWallet] = useState<HDNodeWallet | null>(null);
 
+
   const handleCreateWallet = useCallback(async () => {
     try {
       const newSeedPhrase = await generateSeedPhrase();
-      setSeedPhrase(newSeedPhrase);
       if (isValidSeedPhrase(newSeedPhrase)) {
+        setSeedPhrase(newSeedPhrase);
         const newWallet = Wallet.fromPhrase(newSeedPhrase);
         setWallet(newWallet);
         setStep('seedPhrase');
       } else {
         console.error('Generated invalid seed phrase');
-        // Handle error (e.g., show error message to user)
       }
     } catch (error) {
       console.error('Error creating wallet:', error);
-      // Handle error (e.g., show error message to user)
     }
   }, []);
 
@@ -43,11 +42,9 @@ export function WalletSetup() {
         setStep('password');
       } else {
         console.error('Invalid seed phrase');
-        // Handle error (e.g., show error message to user)
       }
     } catch (error) {
       console.error('Error importing wallet:', error);
-      // Handle error (e.g., show error message to user)
     }
   }, []);
 
@@ -83,20 +80,20 @@ export function WalletSetup() {
 
   return (
     <div className="w-[357px] h-[600px] bg-gray-900 text-white">
-    <main className="h-full">
-      {step === 'welcome' && (
-        <WelcomePage onCreateWallet={handleCreateWallet} onImportWallet={handleImportWallet} />
-      )}
-      {step === 'seedPhrase' && (
-        <SeedPhraseDisplay seedPhrase={seedPhrase} onContinue={() => setStep('confirmation')} />
-      )}
-      {step === 'confirmation' && (
-        <SeedPhraseConfirmation seedPhrase={seedPhrase} onConfirm={handleConfirmSeedPhrase} />
-      )}
-      {step === 'password' && (
-        <PasswordSetup onSetPassword={handleSetPassword} />
-      )}
-    </main>
-  </div>
+      <main className="h-full">
+        {step === 'welcome' && (
+          <WelcomePage onCreateWallet={handleCreateWallet} onImportWallet={handleImportWallet} />
+        )}
+        {step === 'seedPhrase' && seedPhrase && (
+          <SeedPhraseDisplay seedPhrase={seedPhrase} onContinue={() => setStep('confirmation')} />
+        )}
+        {step === 'confirmation' && seedPhrase && (
+          <SeedPhraseConfirmation seedPhrase={seedPhrase} onConfirm={handleConfirmSeedPhrase} />
+        )}
+        {step === 'password' && (
+          <PasswordSetup onSetPassword={handleSetPassword} />
+        )}
+      </main>
+    </div>
   );
 }
