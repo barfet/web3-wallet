@@ -20,24 +20,42 @@ export function WelcomePage({ onCreateWallet, onImportWallet }: WelcomePageProps
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-8">Welcome to Web3 Wallet</h1>
+    <div className="flex flex-col items-center justify-center h-full">
+      <h2 className="text-3xl font-bold mb-8 text-center">Welcome to Web3 Wallet</h2>
       {!showImport ? (
         <>
-          <Button onClick={onCreateWallet} className="mb-4">Create New Wallet</Button>
-          <Button onClick={() => setShowImport(true)} variant="outline">Import Existing Wallet</Button>
+          <Button 
+            onClick={onCreateWallet} 
+            className="w-full mb-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Create New Wallet
+          </Button>
+          <Button 
+            onClick={() => setShowImport(true)} 
+            className="w-full bg-transparent hover:bg-purple-600 text-purple-600 font-semibold hover:text-white py-2 px-4 border border-purple-600 hover:border-transparent rounded"
+          >
+            Import Existing Wallet
+          </Button>
         </>
       ) : (
-        <div className="w-full max-w-md">
+        <div className="w-full">
           <Input
             type="text"
             placeholder="Enter your seed phrase"
             value={importSeedPhrase}
             onChange={(e) => setImportSeedPhrase(e.target.value)}
-            className="mb-4"
+            className="mb-4 w-full p-2 bg-gray-800 border border-gray-700 rounded"
           />
-          <Button onClick={handleImport} className="w-full">Import Wallet</Button>
-          <Button onClick={() => setShowImport(false)} variant="link" className="mt-2">
+          <Button 
+            onClick={handleImport} 
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Import Wallet
+          </Button>
+          <Button 
+            onClick={() => setShowImport(false)} 
+            className="w-full mt-2 bg-transparent hover:bg-gray-800 text-purple-600 font-semibold py-2 px-4 rounded"
+          >
             Back to options
           </Button>
         </div>
