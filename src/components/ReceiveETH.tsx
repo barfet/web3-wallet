@@ -1,61 +1,52 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { QrCode, Copy, Share2 } from 'lucide-react'
-import QRCode from 'qrcode.react'
-import { useWallet } from '@/hooks/useWallet'
+import React from 'react';
+import { QRCodeSVG } from 'qrcode.react';
+import { useWallet } from '@/hooks/useWallet';
+import { Button } from './ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 export function ReceiveETH() {
-  const { walletAddress } = useWallet()
-  const [isCopied, setIsCopied] = useState(false)
+  const { walletAddress } = useWallet();
 
-  const copyAddress = () => {
-    navigator.clipboard.writeText(walletAddress)
-    setIsCopied(true)
-  }
-
-  const shareAddress = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'My ETH Wallet Address',
-        text: `Here's my ETH wallet address: ${walletAddress}`,
-        url: `ethereum:${walletAddress}`
-      }).catch(console.error)
-    } else {
-      console.log('Web Share API not supported')
-    }
-  }
-
-  useEffect(() => {
-    if (isCopied) {
-      const timer = setTimeout(() => setIsCopied(false), 2000)
-      return () => clearTimeout(timer)
-    }
-  }, [isCopied])
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(walletAddress).then(() => {
+      // Optionally, show a success message
+      alert('Address copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy address: ', err);
+    });
+  };
 
   return (
-    <Card>
-      <CardContent className="space-y-4 pt-6">
-        <div className="flex justify-center">
-          <QRCode value={walletAddress} size={200} />
-        </div>
-        <div className="p-2 bg-gray-100 rounded-md flex items-center justify-between">
-          <span className="text-sm font-mono">{walletAddress}</span>
-          <div>
-            <Button variant="ghost" size="icon" onClick={copyAddress}>
-              {isCopied ? <span className="text-green-500">✓</span> : <Copy className="h-4 w-4" />}
-            </Button>
-            <Button variant="ghost" size="icon" onClick={shareAddress}>
-              <Share2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-        <p className="text-sm text-gray-500 text-center">
-          Share this address to receive ETH from others.
-        </p>
-      </CardContent>
-    </Card>
-  )
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
+      <Card className="w-full max-w-md bg-gray-800 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">Receive ETH</CardTitle>
+          <CardDescription className="text-center text-gray-400">
+            Scan the QR code or copy the address below to receive ETH
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center">
+          {walletAddress && (
+            <QRCodeSVG
+              value={walletAddress}
+              size={200}
+              bgColor="#000000"
+              fgColor="#FFFFFF"
+              level="H"
+              includeMargin={false}
+            />
+          )}
+          <p className="mt-4 mb-2 font-mono text-sm break-all">{walletAddress}</p>
+          <Button 
+            onClick={copyToClipboard}
+            className="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Copy Address
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

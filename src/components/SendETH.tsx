@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { TransactionConfirmation } from './TransactionConfirmation'
 import { useWallet } from '@/hooks/useWallet'
 import { ethers, isAddress } from 'ethers'
-import { parseEther } from "ethers";
+import { parseEther, formatEther } from "ethers";
 
 export function SendETH() {
   const [recipient, setRecipient] = useState('')
@@ -28,13 +28,20 @@ export function SendETH() {
       return
     }
 
-    const amountInWei = parseEther(amount)
-    if (amountInWei > balance) {
-      setError('Insufficient balance')
-      return
-    }
+    try {
+      const amountInWei = parseEther(amount)
+      const balanceInWei = parseEther(balance)
+      
+      if (amountInWei > balanceInWei) {
+        setError('Insufficient balance')
+        return
+      }
 
-    setShowConfirmation(true)
+      setShowConfirmation(true)
+    } catch (error) {
+      console.error('Error parsing amount:', error)
+      setError('Invalid amount')
+    }
   }
 
   const handleConfirm = async () => {

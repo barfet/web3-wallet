@@ -28,8 +28,8 @@ export function TransactionConfirmation({
   React.useEffect(() => {
     const fetchGasEstimate = async () => {
       const gasPrice = await getGasPrice(gasSpeed)
-      const gasLimit = 21000 // Standard gas limit for ETH transfers
-      const gasCost = gasPrice.mul(gasLimit)
+      const gasLimit = 21000n // Standard gas limit for ETH transfers
+      const gasCost = gasPrice * BigInt(gasLimit)
       setEstimatedGas(formatEther(gasCost))
     }
     fetchGasEstimate()
