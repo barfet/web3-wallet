@@ -8,14 +8,14 @@ import { WelcomePage } from './WelcomePage';
 import { SeedPhraseDisplay } from './SeedPhraseDisplay';
 import { SeedPhraseConfirmation } from './SeedPhraseConfirmation';
 import { PasswordSetup } from './PasswordSetup';
+import { SendETH } from './SendETH'; // Make sure this import is correct
 import { encryptSeedPhrase, generateSeedPhrase, isValidSeedPhrase } from '@/utils/cryptoUtils';
 import { Wallet } from 'ethers';
 
 export function WalletSetup() {
-  const [step, setStep] = useState<'welcome' | 'seedPhrase' | 'confirmation' | 'password'>('welcome');
+  const [step, setStep] = useState<'welcome' | 'seedPhrase' | 'confirmation' | 'password' | 'dashboard'>('welcome');
   const [seedPhrase, setSeedPhrase] = useState<string>('');
   const [wallet, setWallet] = useState<HDNodeWallet | null>(null);
-
 
   const handleCreateWallet = useCallback(async () => {
     try {
@@ -65,18 +65,21 @@ export function WalletSetup() {
           encryptedSeedPhrase,
           walletAddress: wallet.address,
         }, () => {
-          // Navigate to main wallet interface or dashboard
-          // This part depends on your app's routing mechanism
+          // Clear sensitive data from memory
+          setSeedPhrase('');
+          // Do not clear the wallet here, as we need it for the SendETH component
+          setStep('dashboard');
         });
-        // Clear sensitive data from memory
-        setSeedPhrase('');
-        setWallet(null);
       } catch (error) {
         console.error('Error encrypting seed phrase:', error);
         // Handle error (e.g., show error message to user)
       }
     }
   }, [wallet, seedPhrase]);
+
+  const handlePasswordSet = useCallback(() => {
+    setStep('dashboard');
+  }, []);
 
   return (
     <div className="w-[357px] h-[600px] bg-gray-900 text-white">
@@ -91,7 +94,10 @@ export function WalletSetup() {
           <SeedPhraseConfirmation seedPhrase={seedPhrase} onConfirm={handleConfirmSeedPhrase} />
         )}
         {step === 'password' && (
-          <PasswordSetup onSetPassword={handleSetPassword} />
+          <PasswordSetup onSetPassword={handleSetPassword} onPasswordSet={handlePasswordSet} />
+        )}
+        {step === 'dashboard' && wallet && (
+          <SendETH wallet={wallet} />
         )}
       </main>
     </div>

@@ -8,9 +8,10 @@ import { validatePassword, getPasswordStrength } from '@/utils/passwordUtils';
 
 interface PasswordSetupProps {
   onSetPassword: (password: string) => void;
+  onPasswordSet: () => void; // New prop to handle transition
 }
 
-export function PasswordSetup({ onSetPassword }: PasswordSetupProps) {
+export function PasswordSetup({ onSetPassword, onPasswordSet }: PasswordSetupProps) {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
@@ -32,7 +33,8 @@ export function PasswordSetup({ onSetPassword }: PasswordSetupProps) {
       return
     }
     onSetPassword(password)
-  }, [password, confirmPassword, onSetPassword]);
+    onPasswordSet() // Call this to transition to the next step
+  }, [password, confirmPassword, onSetPassword, onPasswordSet]);
 
   const getStrengthColor = () => {
     switch (passwordStrength) {
