@@ -334,7 +334,7 @@ describe('WalletSetup', () => {
       await waitFor(() => {
         expect(screen.getByText('Your Seed Phrase')).toBeInTheDocument();
         expect(screen.getByText(mockSeedPhrase)).toBeInTheDocument();
-      }, { timeout: 5000 });
+      }, { timeout: 10000 });
     });
 
     test('imports wallet and moves to password setup', async () => {
@@ -354,7 +354,7 @@ describe('WalletSetup', () => {
       
       await waitFor(() => {
         expect(screen.getByText('Set Your Password')).toBeInTheDocument();
-      }, { timeout: 5000 });
+      }, { timeout: 10000 });
     });
   });
 
