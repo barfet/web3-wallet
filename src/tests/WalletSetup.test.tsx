@@ -5,22 +5,15 @@ import { WalletSetup } from '@/components/WalletSetup';
 import * as cryptoUtils from '@/utils/cryptoUtils';
 import { ethers } from 'ethers';
 
-// Define a type for the mock chrome storage
-type MockChromeStorage = {
-  set: jest.Mock<void, [{ [key: string]: any }, (() => void)?]>;
-};
-
 // Mock chrome.storage.local
-const mockChromeStorage: MockChromeStorage = {
-  set: jest.fn((data, callback) => callback && callback()),
+const mockChromeStorage = {
+  set: jest.fn((data, callback) => callback()),
 };
-
-// Set up the mock chrome object
-(global as any).chrome = {
+global.chrome = {
   storage: {
     local: mockChromeStorage,
   },
-};
+} as any;
 
 // Mock cryptoUtils functions
 jest.mock('@/utils/cryptoUtils', () => ({
@@ -29,6 +22,10 @@ jest.mock('@/utils/cryptoUtils', () => ({
 }));
 
 describe('WalletSetup', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   // Unit Tests
   describe('Unit Tests', () => {
     test('renders WelcomePage initially', () => {
@@ -39,7 +36,8 @@ describe('WalletSetup', () => {
     });
 
     test('generateSeedPhrase is called when creating a new wallet', async () => {
-      (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue('test seed phrase');
+      const mockSeedPhrase = 'test seed phrase';
+      (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue(mockSeedPhrase);
       render(<WalletSetup />);
       fireEvent.click(screen.getByText('Create New Wallet'));
       await waitFor(() => {
@@ -48,12 +46,13 @@ describe('WalletSetup', () => {
     });
 
     test('displays SeedPhraseDisplay component after wallet creation', async () => {
-      (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue('test seed phrase');
+      const mockSeedPhrase = 'test seed phrase';
+      (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue(mockSeedPhrase);
       render(<WalletSetup />);
       fireEvent.click(screen.getByText('Create New Wallet'));
       await waitFor(() => {
         expect(screen.getByText('Your Seed Phrase')).toBeInTheDocument();
-        expect(screen.getByText('test seed phrase')).toBeInTheDocument();
+        expect(screen.getByText(mockSeedPhrase)).toBeInTheDocument();
       });
     });
   });
@@ -61,7 +60,8 @@ describe('WalletSetup', () => {
   // Integration Tests
   describe('Integration Tests', () => {
     test('completes wallet creation flow', async () => {
-      (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue('test seed phrase');
+      const mockSeedPhrase = 'test seed phrase';
+      (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue(mockSeedPhrase);
       (cryptoUtils.encryptSeedPhrase as jest.Mock).mockResolvedValue('encrypted_seed_phrase');
       
       render(<WalletSetup />);
@@ -80,7 +80,7 @@ describe('WalletSetup', () => {
       await waitFor(() => {
         expect(screen.getByText('Confirm Your Seed Phrase')).toBeInTheDocument();
       });
-      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: 'test seed phrase' } });
+      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: mockSeedPhrase } });
       fireEvent.click(screen.getByText('Confirm Seed Phrase'));
       
       // Set password
@@ -98,13 +98,14 @@ describe('WalletSetup', () => {
     });
 
     test('handles wallet import flow', async () => {
+      const mockSeedPhrase = 'valid seed phrase for import';
       render(<WalletSetup />);
       
       // Navigate to import wallet
       fireEvent.click(screen.getByText('Import Existing Wallet'));
       
       // Enter seed phrase
-      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: 'valid seed phrase for import' } });
+      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: mockSeedPhrase } });
       fireEvent.click(screen.getByText('Import Wallet'));
       
       // Set password
@@ -125,7 +126,8 @@ describe('WalletSetup', () => {
   // Acceptance Tests
   describe('Acceptance Tests', () => {
     test('User can create a new wallet', async () => {
-      (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue('test seed phrase');
+      const mockSeedPhrase = 'test seed phrase';
+      (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue(mockSeedPhrase);
       (cryptoUtils.encryptSeedPhrase as jest.Mock).mockResolvedValue('encrypted_seed_phrase');
       
       render(<WalletSetup />);
@@ -136,7 +138,7 @@ describe('WalletSetup', () => {
       // User sees the seed phrase
       await waitFor(() => {
         expect(screen.getByText('Your Seed Phrase')).toBeInTheDocument();
-        expect(screen.getByText('test seed phrase')).toBeInTheDocument();
+        expect(screen.getByText(mockSeedPhrase)).toBeInTheDocument();
       });
       
       // User confirms they've written down the seed phrase
@@ -147,7 +149,7 @@ describe('WalletSetup', () => {
       await waitFor(() => {
         expect(screen.getByText('Confirm Your Seed Phrase')).toBeInTheDocument();
       });
-      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: 'test seed phrase' } });
+      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: mockSeedPhrase } });
       fireEvent.click(screen.getByText('Confirm Seed Phrase'));
       
       // User sets a password
@@ -171,13 +173,14 @@ describe('WalletSetup', () => {
     });
 
     test('User can import an existing wallet', async () => {
+      const mockSeedPhrase = 'valid test seed phrase for import';
       render(<WalletSetup />);
       
       // User clicks "Import Existing Wallet"
       fireEvent.click(screen.getByText('Import Existing Wallet'));
       
       // User enters a valid seed phrase
-      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: 'valid test seed phrase for import' } });
+      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: mockSeedPhrase } });
       fireEvent.click(screen.getByText('Import Wallet'));
       
       // User sets a password
