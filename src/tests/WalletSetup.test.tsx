@@ -34,6 +34,9 @@ jest.mock('ethers', () => ({
   },
 }));
 
+// Mock console.error
+console.error = jest.fn();
+
 describe('WalletSetup', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -219,6 +222,169 @@ describe('WalletSetup', () => {
             encryptedSeedPhrase: expect.any(String),
             walletAddress: expect.any(String),
           }),
+          expect.any(Function)
+        );
+      });
+    });
+  });
+
+  // New tests for error handling and updated processes
+  describe('Error Handling', () => {
+    test('handles error when generating invalid seed phrase', async () => {
+      (cryptoUtils.generateSeedPhrase as jest.Mock).mockResolvedValue('invalid seed phrase');
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(false);
+      
+      render(<WalletSetup />);
+      fireEvent.click(screen.getByText('Create New Wallet'));
+      
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith('Generated invalid seed phrase');
+      });
+    });
+
+    test('handles error when creating wallet fails', async () => {
+      (cryptoUtils.generateSeedPhrase as jest.Mock).mockRejectedValue(new Error('Wallet creation failed'));
+      
+      render(<WalletSetup />);
+      fireEvent.click(screen.getByText('Create New Wallet'));
+      
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith('Error creating wallet:', expect.any(Error));
+      });
+    });
+
+    test('handles error when importing invalid seed phrase', async () => {
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(false);
+      
+      render(<WalletSetup />);
+      fireEvent.click(screen.getByText('Import Existing Wallet'));
+      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: 'invalid seed phrase' } });
+      fireEvent.click(screen.getByText('Import Wallet'));
+      
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith('Invalid seed phrase');
+      });
+    });
+
+    test('handles error when importing wallet fails', async () => {
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
+      (Wallet.fromPhrase as jest.Mock).mockImplementation(() => {
+        throw new Error('Import failed');
+      });
+      
+      render(<WalletSetup />);
+      fireEvent.click(screen.getByText('Import Existing Wallet'));
+      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: 'valid seed phrase' } });
+      fireEvent.click(screen.getByText('Import Wallet'));
+      
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith('Error importing wallet:', expect.any(Error));
+      });
+    });
+  });
+
+  describe('Seed Phrase Validation', () => {
+    test('uses isValidSeedPhrase for wallet creation', async () => {
+      const mockSeedPhrase = 'valid test seed phrase';
+      (cryptoUtils.generateSeedPhrase as jest.Mock).mockResolvedValue(mockSeedPhrase);
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
+      
+      render(<WalletSetup />);
+      fireEvent.click(screen.getByText('Create New Wallet'));
+      
+      await waitFor(() => {
+        expect(cryptoUtils.isValidSeedPhrase).toHaveBeenCalledWith(mockSeedPhrase);
+      });
+    });
+
+    test('uses isValidSeedPhrase for wallet import', async () => {
+      const mockSeedPhrase = 'valid imported seed phrase';
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
+      
+      render(<WalletSetup />);
+      fireEvent.click(screen.getByText('Import Existing Wallet'));
+      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: mockSeedPhrase } });
+      fireEvent.click(screen.getByText('Import Wallet'));
+      
+      await waitFor(() => {
+        expect(cryptoUtils.isValidSeedPhrase).toHaveBeenCalledWith(mockSeedPhrase);
+      });
+    });
+  });
+
+  describe('Wallet Creation and Import Process', () => {
+    test('creates wallet and moves to seed phrase display', async () => {
+      const mockSeedPhrase = 'valid test seed phrase';
+      (cryptoUtils.generateSeedPhrase as jest.Mock).mockResolvedValue(mockSeedPhrase);
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
+      
+      render(<WalletSetup />);
+      fireEvent.click(screen.getByText('Create New Wallet'));
+      
+      await waitFor(() => {
+        expect(screen.getByText('Your Seed Phrase')).toBeInTheDocument();
+        expect(screen.getByText(mockSeedPhrase)).toBeInTheDocument();
+      });
+    });
+
+    test('imports wallet and moves to password setup', async () => {
+      const mockSeedPhrase = 'valid imported seed phrase';
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
+      
+      render(<WalletSetup />);
+      fireEvent.click(screen.getByText('Import Existing Wallet'));
+      fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: mockSeedPhrase } });
+      fireEvent.click(screen.getByText('Import Wallet'));
+      
+      await waitFor(() => {
+        expect(screen.getByText('Set Your Password')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Password Setup and Encryption', () => {
+    test('encrypts seed phrase and stores wallet data', async () => {
+      const mockSeedPhrase = 'test seed phrase';
+      const mockPassword = 'securePassword123!';
+      const mockEncryptedSeedPhrase = 'encryptedSeedPhrase';
+      const mockWalletAddress = '0x1234567890123456789012345678901234567890';
+
+      (cryptoUtils.generateSeedPhrase as jest.Mock).mockResolvedValue(mockSeedPhrase);
+      (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
+      (cryptoUtils.encryptSeedPhrase as jest.Mock).mockResolvedValue(mockEncryptedSeedPhrase);
+      (Wallet.fromPhrase as jest.Mock).mockReturnValue({ address: mockWalletAddress });
+
+      render(<WalletSetup />);
+      
+      // Create wallet
+      fireEvent.click(screen.getByText('Create New Wallet'));
+      
+      // Move through seed phrase display and confirmation
+      await waitFor(() => {
+        fireEvent.click(screen.getByText('I have written down my seed phrase'));
+        fireEvent.click(screen.getByText('Continue'));
+      });
+
+      // Confirm seed phrase
+      await waitFor(() => {
+        fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: mockSeedPhrase } });
+        fireEvent.click(screen.getByText('Confirm Seed Phrase'));
+      });
+
+      // Set password
+      await waitFor(() => {
+        fireEvent.change(screen.getByPlaceholderText('Enter password'), { target: { value: mockPassword } });
+        fireEvent.change(screen.getByPlaceholderText('Confirm password'), { target: { value: mockPassword } });
+        fireEvent.click(screen.getByText('Set Password'));
+      });
+
+      // Check if chrome.storage.local.set was called with correct data
+      await waitFor(() => {
+        expect(mockChromeStorage.set).toHaveBeenCalledWith(
+          {
+            encryptedSeedPhrase: mockEncryptedSeedPhrase,
+            walletAddress: mockWalletAddress,
+          },
           expect.any(Function)
         );
       });

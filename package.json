@@ -18,7 +18,9 @@
     "ethers": "^6.13.2",
     "react": "^18",
     "react-dom": "^18",
-    "tailwind-merge": "^2.5.2"
+    "tailwind-merge": "^2.5.2",
+    "validator": "^13.12.0",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.5.0",
@@ -28,6 +30,8 @@
     "@types/jest": "^29.5.13",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/validator": "^13.12.2",
+    "@types/zxcvbn": "^4.4.5",
     "autoprefixer": "^10.0.1",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.8.1",

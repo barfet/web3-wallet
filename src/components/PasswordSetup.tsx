@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { validatePassword, getPasswordStrength } from '@/utils/passwordUtils';
 
 interface PasswordSetupProps {
   onSetPassword: (password: string) => void;
@@ -13,10 +14,17 @@ export function PasswordSetup({ onSetPassword }: PasswordSetupProps) {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
+  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong' | ''>('')
 
-  const handleSetPassword = () => {
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long.')
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    setPasswordStrength(newPassword ? getPasswordStrength(newPassword) : '');
+  };
+
+  const handleSetPassword = useCallback(() => {
+    if (!validatePassword(password)) {
+      setError('Password does not meet security requirements. It must be at least 8 characters long and contain uppercase, lowercase, number, and special characters.')
       return
     }
     if (password !== confirmPassword) {
@@ -24,7 +32,16 @@ export function PasswordSetup({ onSetPassword }: PasswordSetupProps) {
       return
     }
     onSetPassword(password)
-  }
+  }, [password, confirmPassword, onSetPassword]);
+
+  const getStrengthColor = () => {
+    switch (passwordStrength) {
+      case 'weak': return 'text-red-500';
+      case 'medium': return 'text-yellow-500';
+      case 'strong': return 'text-green-500';
+      default: return '';
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
@@ -36,13 +53,20 @@ export function PasswordSetup({ onSetPassword }: PasswordSetupProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter password"
-            className="mb-4 w-full p-2 bg-gray-700 border border-gray-600 rounded text-white"
-          />
+          <div className="mb-4">
+            <Input
+              type="password"
+              value={password}
+              onChange={handlePasswordChange}
+              placeholder="Enter password"
+              className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white"
+            />
+            {passwordStrength && (
+              <p className={`mt-1 text-sm ${getStrengthColor()}`}>
+                Password strength: {passwordStrength}
+              </p>
+            )}
+          </div>
           <Input
             type="password"
             value={confirmPassword}

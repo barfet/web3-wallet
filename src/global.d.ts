@@ -6,4 +6,10 @@ declare global {
       chrome: Chrome;
     }
   }
+
+  interface Window {
+    ethereum?: any;
+  }
 }
+
+export {};
