@@ -66,24 +66,21 @@ export function WalletSetup() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <header className="bg-gray-800 p-4 text-center">
-        <h1 className="text-2xl font-bold">Web3 Wallet</h1>
-      </header>
-      <main className="flex-grow p-4">
-        {step === 'welcome' && (
-          <WelcomePage onCreateWallet={handleCreateWallet} onImportWallet={handleImportWallet} />
-        )}
-        {step === 'seedPhrase' && (
-          <SeedPhraseDisplay seedPhrase={seedPhrase} onContinue={() => setStep('confirmation')} />
-        )}
-        {step === 'confirmation' && (
-          <SeedPhraseConfirmation seedPhrase={seedPhrase} onConfirm={handleConfirmSeedPhrase} />
-        )}
-        {step === 'password' && (
-          <PasswordSetup onSetPassword={handleSetPassword} />
-        )}
-      </main>
-    </div>
+    <div className="w-[357px] h-[600px] bg-gray-900 text-white">
+    <main className="h-full">
+      {step === 'welcome' && (
+        <WelcomePage onCreateWallet={handleCreateWallet} onImportWallet={handleImportWallet} />
+      )}
+      {step === 'seedPhrase' && (
+        <SeedPhraseDisplay seedPhrase={seedPhrase} onContinue={() => setStep('confirmation')} />
+      )}
+      {step === 'confirmation' && (
+        <SeedPhraseConfirmation seedPhrase={seedPhrase} onConfirm={handleConfirmSeedPhrase} />
+      )}
+      {step === 'password' && (
+        <PasswordSetup onSetPassword={handleSetPassword} />
+      )}
+    </main>
+  </div>
   );
 }

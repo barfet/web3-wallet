@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 interface PasswordSetupProps {
   onSetPassword: (password: string) => void;
@@ -27,27 +27,38 @@ export function PasswordSetup({ onSetPassword }: PasswordSetupProps) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h2 className="text-2xl font-bold mb-4">Set Your Password</h2>
-      <p className="mb-4 text-center max-w-md">
-        Create a strong password to secure your wallet. You'll need this password to access your wallet.
-      </p>
-      <Input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Enter password"
-        className="mb-4 w-full max-w-md"
-      />
-      <Input
-        type="password"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        placeholder="Confirm password"
-        className="mb-4 w-full max-w-md"
-      />
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      <Button onClick={handleSetPassword}>Set Password</Button>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
+      <Card className="w-full max-w-md bg-gray-800 border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">Set Your Password</CardTitle>
+          <CardDescription className="text-center text-gray-400">
+            Create a strong password to secure your wallet. You'll need this password to access your wallet.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter password"
+            className="mb-4 w-full p-2 bg-gray-700 border border-gray-600 rounded text-white"
+          />
+          <Input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm password"
+            className="mb-4 w-full p-2 bg-gray-700 border border-gray-600 rounded text-white"
+          />
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+          <Button 
+            onClick={handleSetPassword}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded"
+          >
+            Set Password
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   )
 }
