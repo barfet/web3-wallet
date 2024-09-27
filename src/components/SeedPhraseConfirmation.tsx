@@ -1,59 +1,42 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import React, { useState } from 'react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 interface SeedPhraseConfirmationProps {
   seedPhrase: string;
-  onComplete: () => void;
+  onConfirm: (isConfirmed: boolean) => void;
 }
 
-export function SeedPhraseConfirmation({ seedPhrase, onComplete }: SeedPhraseConfirmationProps) {
-  const [words, setWords] = useState(['', '', ''])
-  const [indexes, setIndexes] = useState<number[]>([])
-  const [error, setError] = useState('')
+export function SeedPhraseConfirmation({ seedPhrase, onConfirm }: SeedPhraseConfirmationProps) {
+  const [confirmationPhrase, setConfirmationPhrase] = useState('');
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    const phraseWords = seedPhrase.split(' ')
-    const randomIndexes: number[] = []
-    while (randomIndexes.length < 3) {
-      const index = Math.floor(Math.random() * phraseWords.length)
-      if (!randomIndexes.includes(index)) {
-        randomIndexes.push(index)
-      }
-    }
-    setIndexes(randomIndexes)
-  }, [seedPhrase])
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const phraseWords = seedPhrase.split(' ')
-    const isCorrect = words.every((word, i) => word.toLowerCase() === phraseWords[indexes[i]].toLowerCase())
-    if (isCorrect) {
-      onComplete()
+  const handleConfirm = () => {
+    if (confirmationPhrase.trim() === seedPhrase.trim()) {
+      onConfirm(true);
     } else {
-      setError('Incorrect words. Please try again.')
+      setError('The seed phrase does not match. Please try again.');
+      onConfirm(false);
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <p>Please enter the following words from your seed phrase:</p>
-      {indexes.map((index, i) => (
-        <div key={i} className="space-y-2">
-          <Label htmlFor={`word-${i}`}>Word #{index + 1}</Label>
-          <Input
-            id={`word-${i}`}
-            value={words[i]}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWords(words.map((w, j) => i === j ? e.target.value : w))}
-            required
-          />
-        </div>
-      ))}
-      {error && <p className="text-red-500">{error}</p>}
-      <Button type="submit" className="w-full">Confirm Seed Phrase</Button>
-    </form>
-  )
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <h2 className="text-2xl font-bold mb-4">Confirm Your Seed Phrase</h2>
+      <p className="mb-4 text-center max-w-md">
+        Please enter your seed phrase to confirm you've written it down correctly.
+      </p>
+      <Input
+        type="text"
+        value={confirmationPhrase}
+        onChange={(e) => setConfirmationPhrase(e.target.value)}
+        placeholder="Enter your seed phrase"
+        className="mb-4 w-full max-w-md"
+      />
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <Button onClick={handleConfirm}>Confirm Seed Phrase</Button>
+    </div>
+  );
 }

@@ -1,48 +1,35 @@
-'use client'
-
-import React, { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle } from 'lucide-react'
+import React, { useState } from 'react';
+import { Button } from './ui/button';
 
 interface SeedPhraseDisplayProps {
   seedPhrase: string;
-  onNext: () => void;
+  onContinue: () => void;
 }
 
-export function SeedPhraseDisplay({ seedPhrase, onNext }: SeedPhraseDisplayProps) {
-  const [showPhrase, setShowPhrase] = useState(false)
-  const [localSeedPhrase, setLocalSeedPhrase] = useState(seedPhrase)
-
-  useEffect(() => {
-    // In a real implementation, generate the seed phrase here
-    // For this example, we'll use a dummy phrase
-    setLocalSeedPhrase("apple banana cherry date elderberry fig grape honeydew imbe jackfruit kiwi lemon")
-  }, [])
+export function SeedPhraseDisplay({ seedPhrase, onContinue }: SeedPhraseDisplayProps) {
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   return (
-    <div className="space-y-4">
-      <Alert>
-        <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>Warning</AlertTitle>
-        <AlertDescription>
-          Never share your seed phrase with anyone. Store it securely offline.
-        </AlertDescription>
-      </Alert>
-      <div className="p-4 bg-gray-100 rounded-md">
-        {showPhrase ? (
-          <p className="text-center break-all">{localSeedPhrase}</p>
-        ) : (
-          <Button onClick={() => setShowPhrase(true)} className="w-full">
-            Reveal Seed Phrase
-          </Button>
-        )}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <h2 className="text-2xl font-bold mb-4">Your Seed Phrase</h2>
+      <p className="mb-4 text-center max-w-md">
+        Write down these 12 words in order and keep them safe. You'll need them to recover your wallet.
+      </p>
+      <div className="bg-white p-4 rounded-md shadow-md mb-4">
+        <p className="font-mono">{seedPhrase}</p>
       </div>
-      {showPhrase && (
-        <Button onClick={onNext} className="w-full">
-          I&apos;ve Securely Saved My Seed Phrase
-        </Button>
-      )}
+      <label className="flex items-center mb-4">
+        <input
+          type="checkbox"
+          checked={isConfirmed}
+          onChange={() => setIsConfirmed(!isConfirmed)}
+          className="mr-2"
+        />
+        I have written down my seed phrase
+      </label>
+      <Button onClick={onContinue} disabled={!isConfirmed}>
+        Continue
+      </Button>
     </div>
-  )
+  );
 }

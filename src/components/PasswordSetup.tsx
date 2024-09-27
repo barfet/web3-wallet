@@ -6,51 +6,48 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 interface PasswordSetupProps {
-  onNext: (password: string) => void;
+  onSetPassword: (password: string) => void;
 }
 
-export function PasswordSetup({ onNext }: PasswordSetupProps) {
+export function PasswordSetup({ onSetPassword }: PasswordSetupProps) {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
+  const handleSetPassword = () => {
     if (password.length < 8) {
-      setError('Password must be at least 8 characters long')
+      setError('Password must be at least 8 characters long.')
       return
     }
-    onNext(password)
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+    onSetPassword(password)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirm Password</Label>
-        <Input
-          id="confirmPassword"
-          type="password"
-          value={confirmPassword}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
-          required
-        />
-      </div>
-      {error && <p className="text-red-500">{error}</p>}
-      <Button type="submit" className="w-full">Set Password</Button>
-    </form>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <h2 className="text-2xl font-bold mb-4">Set Your Password</h2>
+      <p className="mb-4 text-center max-w-md">
+        Create a strong password to secure your wallet. You'll need this password to access your wallet.
+      </p>
+      <Input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Enter password"
+        className="mb-4 w-full max-w-md"
+      />
+      <Input
+        type="password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        placeholder="Confirm password"
+        className="mb-4 w-full max-w-md"
+      />
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <Button onClick={handleSetPassword}>Set Password</Button>
+    </div>
   )
 }
