@@ -4,12 +4,13 @@ import { Onboarding } from '@/components/Onboarding';
 import '../styles/globals.css';
 
 const OnboardingApp: React.FC = () => {
-  const handleStart = () => {
-    // Logic to start wallet creation or import
-    // Redirect to the appropriate page or component
+  const handleComplete = () => {
+    // Close the onboarding tab and open the popup
+    window.close();
+    chrome.action.openPopup();
   };
 
-  return <Onboarding onStart={handleStart} />;
+  return <Onboarding onComplete={handleComplete} />;
 };
 
 const container = document.getElementById('root');

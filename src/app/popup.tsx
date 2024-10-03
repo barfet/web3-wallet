@@ -1,15 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import { WalletSetup } from '@/components/WalletSetup';
 import '../styles/globals.css';
 
 const Popup: React.FC = () => {
+  const [currentView, setCurrentView] = useState<'app' | 'create' | 'import' | 'setup'>('setup');
+
   useEffect(() => {
     const checkWalletSetup = async () => {
       const result = await chrome.storage.local.get(['walletAddress']);
-      if (!result.walletAddress) {
-        // Redirect to onboarding page if no wallet is set up
-        window.location.href = chrome.runtime.getURL('onboarding.html');
+      if (result.walletAddress) {
+        setCurrentView('app');
+      } else {
+        // If no wallet is set up, open the full onboarding page
+        chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') });
+        window.close(); // Close the popup
       }
     };
 
@@ -18,7 +24,9 @@ const Popup: React.FC = () => {
 
   return (
     <div className="w-[357px] h-[600px] bg-gray-900 text-white">
-      <App />
+      {currentView === 'app' && <App />}
+      {currentView === 'create' && <WalletSetup initialStep="create" onComplete={() => setCurrentView('app')} />}
+      {currentView === 'import' && <WalletSetup initialStep="import" onComplete={() => setCurrentView('app')} />}
     </div>
   );
 };

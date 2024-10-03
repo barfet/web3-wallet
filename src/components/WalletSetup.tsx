@@ -1,28 +1,28 @@
 'use client'
 
-/// <reference types="chrome"/>
-
 import React, { useState, useCallback } from 'react';
-import { Onboarding } from './Onboarding';
 import { WelcomePage } from './WelcomePage';
 import { SeedPhraseDisplay } from './SeedPhraseDisplay';
 import { SeedPhraseConfirmation } from './SeedPhraseConfirmation';
 import { PasswordSetup } from './PasswordSetup';
-import { SendETH } from './SendETH'; // Make sure this import is correct
+import { SendETH } from './SendETH';
 import { encryptSeedPhrase, generateSeedPhrase, isValidSeedPhrase } from '@/utils/cryptoUtils';
 import { BaseWallet, Wallet, HDNodeWallet, ethers } from 'ethers';
 
-export function WalletSetup() {
-  const [step, setStep] = useState<'onboarding' | 'welcome' | 'seedPhrase' | 'confirmation' | 'password' | 'dashboard'>('onboarding');
+type Step = 'welcome' | 'seedPhrase' | 'confirmation' | 'password' | 'dashboard';
+
+interface WalletSetupProps {
+  initialStep: 'create' | 'import';
+  onComplete: () => void;
+  isFullScreen?: boolean;
+}
+
+export function WalletSetup({ initialStep, onComplete, isFullScreen = false }: WalletSetupProps) {
+  const [step, setStep] = useState<Step>(initialStep === 'create' ? 'seedPhrase' : 'welcome');
   const [seedPhrase, setSeedPhrase] = useState<string>('');
   const [wallet, setWallet] = useState<HDNodeWallet | null>(null);
 
-  const handleStart = useCallback(() => {
-    // Open the onboarding page in a new tab
-    window.open(chrome.runtime.getURL('onboarding.html'), '_blank');
-  }, []);
-
-  const handleCreateWallet = useCallback(async () => {
+  const handleCreateNewWallet = useCallback(async () => {
     try {
       const newSeedPhrase = await generateSeedPhrase();
       if (isValidSeedPhrase(newSeedPhrase)) {
@@ -47,9 +47,7 @@ export function WalletSetup() {
           setWallet(importedWallet);
           setStep('password');
         } else {
-          // Handle the case where the wallet is not an HDNodeWallet
           console.error('Imported wallet is not an HDNodeWallet');
-          // Optionally, show an error message to the user
         }
       } else {
         console.error('Invalid seed phrase');
@@ -79,25 +77,31 @@ export function WalletSetup() {
           // Clear sensitive data from memory
           setSeedPhrase('');
           // Do not clear the wallet here, as we need it for the SendETH component
-          setStep('dashboard');
+          onComplete(); // Call onComplete to signal that the setup is finished
         });
       } catch (error) {
         console.error('Error encrypting seed phrase:', error);
         // Handle error (e.g., show error message to user)
       }
     }
-  }, [wallet, seedPhrase]);
+  }, [wallet, seedPhrase, onComplete]);
 
-  const handlePasswordSet = useCallback(() => {
-    setStep('dashboard');
-  }, []);
+  // Call handleCreateNewWallet immediately if initialStep is 'create'
+  React.useEffect(() => {
+    if (initialStep === 'create') {
+      handleCreateNewWallet();
+    }
+  }, [initialStep, handleCreateNewWallet]);
+
+  const containerClass = isFullScreen 
+    ? "min-h-screen bg-gradient-to-br from-purple-50 via-purple-50 to-white p-4" 
+    : "w-[357px] h-[600px] bg-gray-900 text-white";
 
   return (
-    <div className="w-[357px] h-[600px] bg-gray-900 text-white">
+    <div className={containerClass}>
       <main className="h-full">
-        {step === 'onboarding' && <Onboarding onStart={handleStart} />}
         {step === 'welcome' && (
-          <WelcomePage onCreateWallet={handleCreateWallet} onImportWallet={handleImportWallet} />
+          <WelcomePage onCreateWallet={handleCreateNewWallet} onImportWallet={handleImportWallet} />
         )}
         {step === 'seedPhrase' && seedPhrase && (
           <SeedPhraseDisplay seedPhrase={seedPhrase} onContinue={() => setStep('confirmation')} />
@@ -106,7 +110,7 @@ export function WalletSetup() {
           <SeedPhraseConfirmation seedPhrase={seedPhrase} onConfirm={handleConfirmSeedPhrase} />
         )}
         {step === 'password' && (
-          <PasswordSetup onSetPassword={handleSetPassword} onPasswordSet={handlePasswordSet} />
+          <PasswordSetup onSetPassword={handleSetPassword} onPasswordSet={() => {}} />
         )}
         {step === 'dashboard' && wallet && (
           <SendETH wallet={wallet} />
