@@ -2,20 +2,24 @@
 
 /// <reference types="chrome"/>
 
-import React, { useState, useCallback, useEffect } from 'react';
-import { ethers, HDNodeWallet } from 'ethers';
+import React, { useState, useCallback } from 'react';
+import { Onboarding } from './Onboarding';
 import { WelcomePage } from './WelcomePage';
 import { SeedPhraseDisplay } from './SeedPhraseDisplay';
 import { SeedPhraseConfirmation } from './SeedPhraseConfirmation';
 import { PasswordSetup } from './PasswordSetup';
 import { SendETH } from './SendETH'; // Make sure this import is correct
 import { encryptSeedPhrase, generateSeedPhrase, isValidSeedPhrase } from '@/utils/cryptoUtils';
-import { Wallet } from 'ethers';
+import { BaseWallet, Wallet, HDNodeWallet, ethers } from 'ethers';
 
 export function WalletSetup() {
-  const [step, setStep] = useState<'welcome' | 'seedPhrase' | 'confirmation' | 'password' | 'dashboard'>('welcome');
+  const [step, setStep] = useState<'onboarding' | 'welcome' | 'seedPhrase' | 'confirmation' | 'password' | 'dashboard'>('onboarding');
   const [seedPhrase, setSeedPhrase] = useState<string>('');
   const [wallet, setWallet] = useState<HDNodeWallet | null>(null);
+
+  const handleStart = useCallback(() => {
+    setStep('welcome');
+  }, []);
 
   const handleCreateWallet = useCallback(async () => {
     try {
@@ -36,10 +40,16 @@ export function WalletSetup() {
   const handleImportWallet = useCallback(async (importedSeedPhrase: string) => {
     try {
       if (isValidSeedPhrase(importedSeedPhrase)) {
-        const importedWallet = Wallet.fromPhrase(importedSeedPhrase);
-        setSeedPhrase(importedSeedPhrase);
-        setWallet(importedWallet);
-        setStep('password');
+        const importedWallet = Wallet.fromPhrase(importedSeedPhrase) as BaseWallet;
+        if (importedWallet instanceof ethers.HDNodeWallet) {
+          setSeedPhrase(importedSeedPhrase);
+          setWallet(importedWallet);
+          setStep('password');
+        } else {
+          // Handle the case where the wallet is not an HDNodeWallet
+          console.error('Imported wallet is not an HDNodeWallet');
+          // Optionally, show an error message to the user
+        }
       } else {
         console.error('Invalid seed phrase');
       }
@@ -84,6 +94,7 @@ export function WalletSetup() {
   return (
     <div className="w-[357px] h-[600px] bg-gray-900 text-white">
       <main className="h-full">
+        {step === 'onboarding' && <Onboarding onStart={handleStart} />}
         {step === 'welcome' && (
           <WelcomePage onCreateWallet={handleCreateWallet} onImportWallet={handleImportWallet} />
         )}
