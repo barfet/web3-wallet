@@ -8,9 +8,6 @@ import { PasswordSetup } from './PasswordSetup';
 import { SendETH } from './SendETH';
 import { encryptSeedPhrase, generateSeedPhrase, isValidSeedPhrase } from '@/utils/cryptoUtils';
 import { BaseWallet, Wallet, HDNodeWallet, ethers } from 'ethers';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { ArrowLeft } from 'lucide-react';
 
 type Step = 'welcome' | 'createPassword' | 'seedPhrase' | 'confirmation' | 'password' | 'dashboard';
 
@@ -120,70 +117,42 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
     }
   };
 
-  const renderStepIndicator = () => {
-    const steps = ['createPassword', 'seedPhrase', 'confirmation', 'password'];
-    const currentStepIndex = steps.indexOf(step);
-    return (
-      <div className="flex justify-center space-x-2 mb-6 absolute top-4 left-1/2 transform -translate-x-1/2">
-        {steps.map((_, index) => (
-          <div
-            key={index}
-            className={`w-2 h-2 rounded-full ${
-              index <= currentStepIndex ? 'bg-purple-600' : 'bg-gray-300'
-            }`}
-          />
-        ))}
-      </div>
-    );
-  };
-
   const containerClass = isFullScreen 
-    ? "min-h-screen bg-gradient-to-br from-purple-50 via-purple-50 to-white p-4 flex items-center justify-center" 
-    : "w-[357px] h-[600px] bg-gray-900 text-white";
+    ? "min-h-screen bg-gray-900 flex items-center justify-center" 
+    : "w-[357px] h-[600px] bg-black text-white";
 
   return (
     <div className={containerClass}>
-      <Card className="w-full max-w-md mx-auto relative bg-white/80 border border-purple-100 shadow-xl rounded-2xl backdrop-blur-sm">
-        {renderStepIndicator()}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={handleBack} 
-          className="absolute top-4 left-4 text-purple-600"
-        >
-          <ArrowLeft className="h-6 w-6" />
-        </Button>
-        <CardContent className="pt-16 pb-8 px-8">
-          {step === 'welcome' && (
-            <WelcomePage onCreateWallet={() => setStep('createPassword')} onImportWallet={handleImportWallet} />
-          )}
-          {step === 'createPassword' && (
-            <PasswordSetup
-              onSetPassword={handleSetPassword}
-              onBack={handleBack}
-              currentStep={1}
-              totalSteps={4}
-            />
-          )}
-          {step === 'seedPhrase' && seedPhrase && (
-            <SeedPhraseDisplay seedPhrase={seedPhrase} onContinue={() => setStep('confirmation')} />
-          )}
-          {step === 'confirmation' && seedPhrase && (
-            <SeedPhraseConfirmation seedPhrase={seedPhrase} onConfirm={handleConfirmSeedPhrase} />
-          )}
-          {step === 'password' && (
-            <PasswordSetup
-              onSetPassword={handleFinalPasswordSetup}
-              onBack={handleBack}
-              currentStep={4}
-              totalSteps={4}
-            />
-          )}
-          {step === 'dashboard' && wallet && (
-            <SendETH wallet={wallet} />
-          )}
-        </CardContent>
-      </Card>
+      <div className="w-[400px] h-[500px] bg-black text-white p-6 rounded-lg flex flex-col">
+        {step === 'welcome' && (
+          <WelcomePage onCreateWallet={() => setStep('createPassword')} onImportWallet={handleImportWallet} />
+        )}
+        {step === 'createPassword' && (
+          <PasswordSetup
+            onSetPassword={handleSetPassword}
+            onBack={handleBack}
+            currentStep={1}
+            totalSteps={4}
+          />
+        )}
+        {step === 'seedPhrase' && seedPhrase && (
+          <SeedPhraseDisplay seedPhrase={seedPhrase} onContinue={() => setStep('confirmation')} />
+        )}
+        {step === 'confirmation' && seedPhrase && (
+          <SeedPhraseConfirmation seedPhrase={seedPhrase} onConfirm={handleConfirmSeedPhrase} />
+        )}
+        {step === 'password' && (
+          <PasswordSetup
+            onSetPassword={handleFinalPasswordSetup}
+            onBack={handleBack}
+            currentStep={4}
+            totalSteps={4}
+          />
+        )}
+        {step === 'dashboard' && wallet && (
+          <SendETH wallet={wallet} />
+        )}
+      </div>
     </div>
   );
 }
