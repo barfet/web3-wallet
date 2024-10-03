@@ -3,15 +3,14 @@
 import React, { useState, useCallback } from 'react';
 import { WelcomePage } from './WelcomePage';
 import { SeedPhraseDisplay } from './SeedPhraseDisplay';
-import { SeedPhraseConfirmation } from './SeedPhraseConfirmation';
 import { PasswordSetup } from './PasswordSetup';
-import { SendETH } from './SendETH';
+import { SuccessScreen } from './SuccessScreen';
 import { encryptSeedPhrase, generateSeedPhrase, isValidSeedPhrase } from '@/utils/cryptoUtils';
 import { BaseWallet, Wallet, HDNodeWallet, ethers } from 'ethers';
 import { Button } from './ui/button';
 import { ArrowLeft } from 'lucide-react';
 
-type Step = 'welcome' | 'createPassword' | 'seedPhrase' | 'confirmation' | 'password' | 'dashboard';
+type Step = 'welcome' | 'createPassword' | 'seedPhrase' | 'success' | 'password' | 'dashboard';
 
 interface WalletSetupProps {
   initialStep: 'create' | 'import';
@@ -61,28 +60,14 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
     }
   }, []);
 
-  const handleConfirmSeedPhrase = useCallback((isConfirmed: boolean) => {
-    if (isConfirmed) {
-      setStep('password');
-    } else {
-      // Handle incorrect confirmation (e.g., show error message, reset confirmation)
-    }
-  }, []);
-
   const handleSetPassword = useCallback(async (newPassword: string) => {
     setPassword(newPassword);
     if (initialStep === 'create') {
-      const newSeedPhrase = await generateSeedPhrase();
-      if (isValidSeedPhrase(newSeedPhrase)) {
-        setSeedPhrase(newSeedPhrase);
-        setStep('seedPhrase');
-      } else {
-        console.error('Generated invalid seed phrase');
-      }
+      await handleCreateNewWallet();
     } else {
       setStep('welcome');
     }
-  }, [initialStep]);
+  }, [initialStep, handleCreateNewWallet]);
 
   const handleFinalPasswordSetup = useCallback(async () => {
     if (wallet && seedPhrase && password) {
@@ -95,15 +80,19 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
         }, () => {
           // Clear sensitive data from memory
           setSeedPhrase('');
-          // Do not clear the wallet here, as we need it for the SendETH component
-          onComplete(); // Call onComplete to signal that the setup is finished
+          // Move to success screen
+          setStep('success');
         });
       } catch (error) {
         console.error('Error encrypting seed phrase:', error);
         // Handle error (e.g., show error message to user)
       }
     }
-  }, [wallet, seedPhrase, password, onComplete]);
+  }, [wallet, seedPhrase, password]);
+
+  const handleSeedPhraseConfirmed = useCallback(() => {
+    setStep('success');
+  }, []);
 
   const handleBack = () => {
     switch (step) {
@@ -114,11 +103,8 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
       case 'seedPhrase':
         setStep('createPassword');
         break;
-      case 'confirmation':
-        setStep('seedPhrase');
-        break;
       case 'password':
-        setStep(initialStep === 'create' ? 'confirmation' : 'welcome');
+        setStep(initialStep === 'create' ? 'seedPhrase' : 'welcome');
         break;
       default:
         break;
@@ -126,7 +112,7 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
   };
 
   const getTotalSteps = () => {
-    return initialStep === 'create' ? 4 : 2;
+    return initialStep === 'create' ? 3 : 2;
   };
 
   const getCurrentStep = () => {
@@ -135,10 +121,8 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
         return 1;
       case 'seedPhrase':
         return 2;
-      case 'confirmation':
-        return 3;
       case 'password':
-        return initialStep === 'create' ? 4 : 2;
+        return initialStep === 'create' ? 3 : 2;
       default:
         return 1;
     }
@@ -151,21 +135,23 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
   return (
     <div className={containerClass}>
       <div className="w-full max-w-md mx-auto bg-black bg-opacity-50 backdrop-blur-lg p-6 rounded-lg shadow-lg text-white">
-        <div className="flex items-center justify-between mb-4">
-          <Button variant="ghost" size="icon" onClick={handleBack} className="text-purple-300 hover:text-purple-100">
-            <ArrowLeft className="h-6 w-6" />
-          </Button>
-          <div className="flex space-x-1">
-            {Array.from({ length: getTotalSteps() }).map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full ${
-                  index < getCurrentStep() ? 'bg-purple-400' : 'bg-gray-600'
-                }`}
-              />
-            ))}
+        {step !== 'success' && (
+          <div className="flex items-center justify-between mb-4">
+            <Button variant="ghost" size="icon" onClick={handleBack} className="text-purple-300 hover:text-purple-100">
+              <ArrowLeft className="h-6 w-6" />
+            </Button>
+            <div className="flex space-x-1">
+              {Array.from({ length: getTotalSteps() }).map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full ${
+                    index < getCurrentStep() ? 'bg-purple-400' : 'bg-gray-600'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         {step === 'welcome' && (
           <WelcomePage onCreateWallet={() => setStep('createPassword')} onImportWallet={handleImportWallet} />
         )}
@@ -179,11 +165,8 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
         {step === 'seedPhrase' && seedPhrase && (
           <SeedPhraseDisplay 
             seedPhrase={seedPhrase} 
-            onContinue={() => setStep('confirmation')}
+            onContinue={handleSeedPhraseConfirmed}
           />
-        )}
-        {step === 'confirmation' && seedPhrase && (
-          <SeedPhraseConfirmation seedPhrase={seedPhrase} onConfirm={handleConfirmSeedPhrase} />
         )}
         {step === 'password' && (
           <PasswordSetup
@@ -192,8 +175,8 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
             totalSteps={getTotalSteps()}
           />
         )}
-        {step === 'dashboard' && wallet && (
-          <SendETH wallet={wallet} />
+        {step === 'success' && (
+          <SuccessScreen onGetStarted={onComplete} />
         )}
       </div>
     </div>
