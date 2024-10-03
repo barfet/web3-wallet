@@ -27,8 +27,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-      <div className="w-[400px] h-[500px] bg-black text-white p-6 rounded-lg flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 flex items-center justify-center">
+      <div className="w-[400px] bg-black bg-opacity-50 backdrop-blur-lg text-white p-6 rounded-lg flex flex-col">
         <div className="flex-grow flex flex-col items-center justify-center">
           <img
             src={chrome.runtime.getURL('images/logo.png')}
@@ -36,7 +36,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             className="w-20 h-20 mb-6"
           />
           <h2 className="text-2xl font-bold text-center mb-2">SpectraVault</h2>
-          <p className="text-center text-gray-400 mb-6">
+          <p className="text-center text-gray-300 mb-6">
             To get started, create a new wallet or import an existing one.
           </p>
           <div className="space-y-4 w-full">
@@ -48,7 +48,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             </Button>
             <Button 
               onClick={handleImportWallet} 
-              className="w-full bg-transparent hover:bg-gray-800 text-white border border-gray-600 py-3 rounded"
+              className="w-full bg-transparent hover:bg-purple-800 hover:bg-opacity-50 text-white border border-purple-500 py-3 rounded"
             >
               I already have a wallet
             </Button>

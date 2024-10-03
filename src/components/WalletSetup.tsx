@@ -8,6 +8,8 @@ import { PasswordSetup } from './PasswordSetup';
 import { SendETH } from './SendETH';
 import { encryptSeedPhrase, generateSeedPhrase, isValidSeedPhrase } from '@/utils/cryptoUtils';
 import { BaseWallet, Wallet, HDNodeWallet, ethers } from 'ethers';
+import { Button } from './ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 type Step = 'welcome' | 'createPassword' | 'seedPhrase' | 'confirmation' | 'password' | 'dashboard';
 
@@ -70,11 +72,17 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
   const handleSetPassword = useCallback(async (newPassword: string) => {
     setPassword(newPassword);
     if (initialStep === 'create') {
-      await handleCreateNewWallet();
+      const newSeedPhrase = await generateSeedPhrase();
+      if (isValidSeedPhrase(newSeedPhrase)) {
+        setSeedPhrase(newSeedPhrase);
+        setStep('seedPhrase');
+      } else {
+        console.error('Generated invalid seed phrase');
+      }
     } else {
       setStep('welcome');
     }
-  }, [initialStep, handleCreateNewWallet]);
+  }, [initialStep]);
 
   const handleFinalPasswordSetup = useCallback(async () => {
     if (wallet && seedPhrase && password) {
@@ -117,26 +125,62 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
     }
   };
 
+  const getTotalSteps = () => {
+    return initialStep === 'create' ? 4 : 2;
+  };
+
+  const getCurrentStep = () => {
+    switch (step) {
+      case 'createPassword':
+        return 1;
+      case 'seedPhrase':
+        return 2;
+      case 'confirmation':
+        return 3;
+      case 'password':
+        return initialStep === 'create' ? 4 : 2;
+      default:
+        return 1;
+    }
+  };
+
   const containerClass = isFullScreen 
-    ? "min-h-screen bg-gray-900 flex items-center justify-center" 
-    : "w-[357px] h-[600px] bg-black text-white";
+    ? "min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800" 
+    : "w-[357px] h-[600px] bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800";
 
   return (
     <div className={containerClass}>
-      <div className="w-[400px] h-[500px] bg-black text-white p-6 rounded-lg flex flex-col">
+      <div className="w-full max-w-md mx-auto bg-black bg-opacity-50 backdrop-blur-lg p-6 rounded-lg shadow-lg text-white">
+        <div className="flex items-center justify-between mb-4">
+          <Button variant="ghost" size="icon" onClick={handleBack} className="text-purple-300 hover:text-purple-100">
+            <ArrowLeft className="h-6 w-6" />
+          </Button>
+          <div className="flex space-x-1">
+            {Array.from({ length: getTotalSteps() }).map((_, index) => (
+              <div
+                key={index}
+                className={`w-2 h-2 rounded-full ${
+                  index < getCurrentStep() ? 'bg-purple-400' : 'bg-gray-600'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
         {step === 'welcome' && (
           <WelcomePage onCreateWallet={() => setStep('createPassword')} onImportWallet={handleImportWallet} />
         )}
         {step === 'createPassword' && (
           <PasswordSetup
             onSetPassword={handleSetPassword}
-            onBack={handleBack}
-            currentStep={1}
-            totalSteps={4}
+            currentStep={getCurrentStep()}
+            totalSteps={getTotalSteps()}
           />
         )}
         {step === 'seedPhrase' && seedPhrase && (
-          <SeedPhraseDisplay seedPhrase={seedPhrase} onContinue={() => setStep('confirmation')} />
+          <SeedPhraseDisplay 
+            seedPhrase={seedPhrase} 
+            onContinue={() => setStep('confirmation')}
+          />
         )}
         {step === 'confirmation' && seedPhrase && (
           <SeedPhraseConfirmation seedPhrase={seedPhrase} onConfirm={handleConfirmSeedPhrase} />
@@ -144,9 +188,8 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
         {step === 'password' && (
           <PasswordSetup
             onSetPassword={handleFinalPasswordSetup}
-            onBack={handleBack}
-            currentStep={4}
-            totalSteps={4}
+            currentStep={getCurrentStep()}
+            totalSteps={getTotalSteps()}
           />
         )}
         {step === 'dashboard' && wallet && (

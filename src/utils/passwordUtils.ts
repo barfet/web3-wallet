@@ -25,6 +25,8 @@ export function validatePassword(password: string): boolean {
 }
 
 export function getPasswordStrength(password: string): 'weak' | 'medium' | 'strong' {
+  if (!password) return 'weak';
+  
   const result = zxcvbn(password);
   
   if (result.score <= 2) return 'weak';
