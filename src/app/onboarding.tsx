@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Onboarding } from '@/components/Onboarding';
+import '../styles/globals.css';
 
 const OnboardingApp: React.FC = () => {
   const handleStart = () => {
