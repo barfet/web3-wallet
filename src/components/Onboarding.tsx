@@ -14,12 +14,14 @@ export function Onboarding({ onComplete }: OnboardingProps) {
 
   const handleCreateNewWallet = () => setStep('create');
   const handleImportWallet = () => setStep('import');
+  const handleBack = () => setStep('welcome');
 
   if (step !== 'welcome') {
     return (
       <WalletSetup 
         initialStep={step} 
         onComplete={onComplete}
+        onBack={handleBack}
         isFullScreen={true}
       />
     );

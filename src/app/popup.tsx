@@ -22,11 +22,15 @@ const Popup: React.FC = () => {
     checkWalletSetup();
   }, []);
 
+  const handleBack = () => {
+    setCurrentView('setup');
+  };
+
   return (
     <div className="w-[357px] h-[600px] bg-gray-900 text-white">
       {currentView === 'app' && <App />}
-      {currentView === 'create' && <WalletSetup initialStep="create" onComplete={() => setCurrentView('app')} />}
-      {currentView === 'import' && <WalletSetup initialStep="import" onComplete={() => setCurrentView('app')} />}
+      {currentView === 'create' && <WalletSetup initialStep="create" onComplete={() => setCurrentView('app')} onBack={handleBack} />}
+      {currentView === 'import' && <WalletSetup initialStep="import" onComplete={() => setCurrentView('app')} onBack={handleBack} />}
     </div>
   );
 };

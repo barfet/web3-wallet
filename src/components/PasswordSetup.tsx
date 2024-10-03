@@ -1,90 +1,100 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import React, { useState, useCallback } from 'react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Checkbox } from './ui/checkbox'; // Make sure this component exists
 import { validatePassword, getPasswordStrength } from '@/utils/passwordUtils';
+import { ArrowLeft } from 'lucide-react';
 
 interface PasswordSetupProps {
   onSetPassword: (password: string) => void;
-  onPasswordSet: () => void; // New prop to handle transition
+  onBack: () => void;
+  currentStep: number;
+  totalSteps: number;
 }
 
-export function PasswordSetup({ onSetPassword, onPasswordSet }: PasswordSetupProps) {
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong' | ''>('')
+export function PasswordSetup({ onSetPassword, onBack, currentStep, totalSteps }: PasswordSetupProps) {
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newPassword = e.target.value;
-    setPassword(newPassword);
-    setPasswordStrength(newPassword ? getPasswordStrength(newPassword) : '');
-  };
+  const handlePasswordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  }, []);
 
-  const handleSetPassword = useCallback(() => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
     if (!validatePassword(password)) {
-      setError('Password does not meet security requirements. It must be at least 8 characters long and contain uppercase, lowercase, number, and special characters.')
-      return
+      setError('Password does not meet security requirements.');
+      return;
     }
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.')
-      return
-    }
-    onSetPassword(password)
-    onPasswordSet() // Call this to transition to the next step
-  }, [password, confirmPassword, onSetPassword, onPasswordSet]);
 
-  const getStrengthColor = () => {
-    switch (passwordStrength) {
-      case 'weak': return 'text-red-500';
-      case 'medium': return 'text-yellow-500';
-      case 'strong': return 'text-green-500';
-      default: return '';
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
     }
+
+    if (!agreedToTerms) {
+      setError('Please agree to the Terms of Service.');
+      return;
+    }
+
+    onSetPassword(password);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
-      <Card className="w-full max-w-md bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Set Your Password</CardTitle>
-          <CardDescription className="text-center text-gray-400">
-            Create a strong password to secure your wallet. You'll need this password to access your wallet.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4">
-            <Input
-              type="password"
-              value={password}
-              onChange={handlePasswordChange}
-              placeholder="Enter password"
-              className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white"
+    <div className="w-full max-w-md mx-auto bg-black text-white p-6 rounded-lg">
+      <div className="flex items-center justify-between mb-4">
+        <Button variant="ghost" size="icon" onClick={onBack} className="text-white">
+          <ArrowLeft className="h-6 w-6" />
+        </Button>
+        <div className="flex space-x-1">
+          {Array.from({ length: totalSteps }).map((_, index) => (
+            <div
+              key={index}
+              className={`w-2 h-2 rounded-full ${
+                index < currentStep ? 'bg-purple-600' : 'bg-gray-600'
+              }`}
             />
-            {passwordStrength && (
-              <p className={`mt-1 text-sm ${getStrengthColor()}`}>
-                Password strength: {passwordStrength}
-              </p>
-            )}
-          </div>
-          <Input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm password"
-            className="mb-4 w-full p-2 bg-gray-700 border border-gray-600 rounded text-white"
+          ))}
+        </div>
+      </div>
+      <h2 className="text-2xl font-bold text-center mb-2">Create a password</h2>
+      <p className="text-center text-gray-400 mb-6">You will use this to unlock your wallet.</p>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          type="password"
+          value={password}
+          onChange={handlePasswordChange}
+          placeholder="Password"
+          className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white"
+        />
+        <Input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Confirm Password"
+          className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white"
+        />
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="terms"
+            checked={agreedToTerms}
+            onCheckedChange={(checked: boolean) => setAgreedToTerms(checked)}
           />
-          {error && <p className="text-red-500 mb-4">{error}</p>}
-          <Button 
-            onClick={handleSetPassword}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded"
-          >
-            Set Password
-          </Button>
-        </CardContent>
-      </Card>
+          <label htmlFor="terms" className="text-sm text-gray-300">
+            I agree to the <span className="text-purple-500">Terms of Service</span>
+          </label>
+        </div>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded">
+          Continue
+        </Button>
+      </form>
     </div>
-  )
+  );
 }

@@ -52,11 +52,12 @@ describe('WalletSetup', () => {
   });
 
   const mockOnComplete = jest.fn();
+  const mockOnBack = jest.fn();
 
   // Unit Tests
   describe('Unit Tests', () => {
     test('renders WelcomePage initially', () => {
-      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} onBack={mockOnBack} />);
       expect(screen.getByText('Web3 Wallet')).toBeInTheDocument();
       expect(screen.getByText('Create New Wallet')).toBeInTheDocument();
       expect(screen.getByText('Import Existing Wallet')).toBeInTheDocument();
@@ -66,7 +67,7 @@ describe('WalletSetup', () => {
       const mockSeedPhrase = 'test seed phrase';
       (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue(mockSeedPhrase);
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
-      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} onBack={mockOnBack} />);
       fireEvent.click(screen.getByText('Create New Wallet'));
       await waitFor(() => {
         expect(cryptoUtils.generateSeedPhrase).toHaveBeenCalled();
@@ -79,7 +80,7 @@ describe('WalletSetup', () => {
       const mockSeedPhrase = 'test seed phrase';
       (cryptoUtils.generateSeedPhrase as jest.Mock).mockReturnValue(mockSeedPhrase);
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
-      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} onBack={mockOnBack} />);
       fireEvent.click(screen.getByText('Create New Wallet'));
       await waitFor(() => {
         expect(screen.getByText('Your Seed Phrase')).toBeInTheDocument();
@@ -96,7 +97,7 @@ describe('WalletSetup', () => {
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       (cryptoUtils.encryptSeedPhrase as jest.Mock).mockResolvedValue('encrypted_seed_phrase');
       
-      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} onBack={mockOnBack} />);
       
       // Create new wallet
       fireEvent.click(screen.getByText('Create New Wallet'));
@@ -132,7 +133,7 @@ describe('WalletSetup', () => {
     test('handles wallet import flow', async () => {
       const mockSeedPhrase = 'valid seed phrase for import';
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
-      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} onBack={mockOnBack} />);
       
       // Navigate to import wallet
       fireEvent.click(screen.getByText('Import Existing Wallet'));
@@ -164,7 +165,7 @@ describe('WalletSetup', () => {
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       (cryptoUtils.encryptSeedPhrase as jest.Mock).mockResolvedValue('encrypted_seed_phrase');
       
-      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} onBack={mockOnBack} />);
       
       // User clicks "Create New Wallet"
       fireEvent.click(screen.getByText('Create New Wallet'));
@@ -209,7 +210,7 @@ describe('WalletSetup', () => {
     test('User can import an existing wallet', async () => {
       const mockSeedPhrase = 'valid test seed phrase for import';
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
-      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} onBack={mockOnBack} />);
       
       // User clicks "Import Existing Wallet"
       fireEvent.click(screen.getByText('Import Existing Wallet'));
@@ -245,7 +246,7 @@ describe('WalletSetup', () => {
       (cryptoUtils.generateSeedPhrase as jest.Mock).mockResolvedValue('invalid seed phrase');
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(false);
       
-      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} onBack={mockOnBack} />);
       fireEvent.click(screen.getByText('Create New Wallet'));
       
       await waitFor(() => {
@@ -256,7 +257,7 @@ describe('WalletSetup', () => {
     test('handles error when creating wallet fails', async () => {
       (cryptoUtils.generateSeedPhrase as jest.Mock).mockRejectedValue(new Error('Wallet creation failed'));
       
-      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} onBack={mockOnBack} />);
       fireEvent.click(screen.getByText('Create New Wallet'));
       
       await waitFor(() => {
@@ -267,7 +268,7 @@ describe('WalletSetup', () => {
     test('handles error when importing invalid seed phrase', async () => {
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(false);
       
-      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} onBack={mockOnBack} />);
       fireEvent.click(screen.getByText('Import Existing Wallet'));
       fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: 'invalid seed phrase' } });
       fireEvent.click(screen.getByText('Import Wallet'));
@@ -283,7 +284,7 @@ describe('WalletSetup', () => {
         throw new Error('Import failed');
       });
       
-      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} onBack={mockOnBack} />);
       fireEvent.click(screen.getByText('Import Existing Wallet'));
       fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: 'valid seed phrase' } });
       fireEvent.click(screen.getByText('Import Wallet'));
@@ -300,7 +301,7 @@ describe('WalletSetup', () => {
       (cryptoUtils.generateSeedPhrase as jest.Mock).mockResolvedValue(mockSeedPhrase);
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       
-      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} onBack={mockOnBack} />);
       fireEvent.click(screen.getByText('Create New Wallet'));
       
       await waitFor(() => {
@@ -312,7 +313,7 @@ describe('WalletSetup', () => {
       const mockSeedPhrase = 'valid imported seed phrase';
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       
-      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} onBack={mockOnBack} />);
       fireEvent.click(screen.getByText('Import Existing Wallet'));
       fireEvent.change(screen.getByPlaceholderText('Enter your seed phrase'), { target: { value: mockSeedPhrase } });
       fireEvent.click(screen.getByText('Import Wallet'));
@@ -329,7 +330,7 @@ describe('WalletSetup', () => {
       (cryptoUtils.generateSeedPhrase as jest.Mock).mockResolvedValue(mockSeedPhrase);
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       
-      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} onBack={mockOnBack} />);
       
       fireEvent.click(screen.getByText('Create New Wallet'));
       
@@ -343,7 +344,7 @@ describe('WalletSetup', () => {
       const mockSeedPhrase = 'valid imported seed phrase';
       (cryptoUtils.isValidSeedPhrase as jest.Mock).mockReturnValue(true);
       
-      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="import" onComplete={mockOnComplete} onBack={mockOnBack} />);
       
       fireEvent.click(screen.getByText('Import Existing Wallet'));
       
@@ -372,7 +373,7 @@ describe('WalletSetup', () => {
       (cryptoUtils.encryptSeedPhrase as jest.Mock).mockResolvedValue(mockEncryptedSeedPhrase);
       (Wallet.fromPhrase as jest.Mock).mockReturnValue({ address: mockWalletAddress });
 
-      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} />);
+      render(<WalletSetup initialStep="create" onComplete={mockOnComplete} onBack={mockOnBack} />);
       
       // Create wallet
       fireEvent.click(screen.getByText('Create New Wallet'));
