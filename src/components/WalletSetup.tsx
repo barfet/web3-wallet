@@ -18,7 +18,8 @@ export function WalletSetup() {
   const [wallet, setWallet] = useState<HDNodeWallet | null>(null);
 
   const handleStart = useCallback(() => {
-    setStep('welcome');
+    // Open the onboarding page in a new tab
+    window.open(chrome.runtime.getURL('onboarding.html'), '_blank');
   }, []);
 
   const handleCreateWallet = useCallback(async () => {

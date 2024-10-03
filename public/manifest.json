@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "description": "A secure Web3 wallet Chrome extension",
   "action": {
-    "default_popup": "popup.html",
     "default_icon": {
       "16": "public/icon16.png",
       "48": "public/icon48.png",
@@ -25,6 +24,12 @@
     {
       "matches": ["https://*.ethereum.org/*"],
       "js": ["contentScript.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["onboarding.html"],
+      "matches": ["<all_urls>"]
     }
   ],
   "content_security_policy": {

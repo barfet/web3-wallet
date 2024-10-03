@@ -5,6 +5,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 module.exports = {
   entry: {
     popup: './src/app/popup.tsx',
+    onboarding: './src/app/onboarding.tsx',
     background: './src/background.ts',
     contentScript: './src/contentScript.ts',
   },
@@ -21,21 +22,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          {
-            loader: 'postcss-loader',
-            options: {
-              postcssOptions: {
-                plugins: [
-                  require('tailwindcss'),
-                  require('autoprefixer'),
-                ],
-              },
-            },
-          },
-        ],
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
     ],
   },
@@ -47,14 +34,19 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './public/index.html',
+      template: './public/popup.html',
       filename: 'popup.html',
       chunks: ['popup'],
+    }),
+    new HtmlWebpackPlugin({
+      template: './public/onboarding.html',
+      filename: 'onboarding.html',
+      chunks: ['onboarding'],
     }),
     new CopyPlugin({
       patterns: [
         { from: 'public/manifest.json', to: 'manifest.json' },
-        { from: 'public', to: 'public' },
+        { from: 'public', to: 'public', globOptions: { ignore: ['**/onboarding.html'] } },
       ],
     }),
   ],
