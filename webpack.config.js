@@ -50,6 +50,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: 'public/manifest.json', to: 'manifest.json' },
+        { from: 'public/images', to: 'images' },
         { from: 'public', to: 'public', globOptions: { ignore: ['**/onboarding.html'] } },
       ],
     }),

@@ -28,7 +28,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["onboarding.html"],
+      "resources": ["images/*"],
       "matches": ["<all_urls>"]
     }
   ],
