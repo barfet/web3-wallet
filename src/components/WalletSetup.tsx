@@ -6,6 +6,7 @@ import { SeedPhraseDisplay } from './SeedPhraseDisplay';
 import { PasswordSetup } from './PasswordSetup';
 import { SuccessScreen } from './SuccessScreen';
 import { encryptSeedPhrase, generateSeedPhrase, isValidSeedPhrase } from '@/utils/cryptoUtils';
+import { createUserAccount, saveUserAccount } from '@/utils/accountUtils';
 import { BaseWallet, Wallet, HDNodeWallet, ethers } from 'ethers';
 import { Button } from './ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -69,30 +70,22 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
     }
   }, [initialStep, handleCreateNewWallet]);
 
-  const handleFinalPasswordSetup = useCallback(async () => {
+  const handleSeedPhraseConfirmed = useCallback(async () => {
     if (wallet && seedPhrase && password) {
       try {
-        const encryptedSeedPhrase = await encryptSeedPhrase(seedPhrase, password);
-        // Store encrypted seed phrase and wallet address
-        chrome.storage.local.set({
-          encryptedSeedPhrase,
-          walletAddress: wallet.address,
-        }, () => {
-          // Clear sensitive data from memory
-          setSeedPhrase('');
-          // Move to success screen
-          setStep('success');
-        });
+        const userAccount = await createUserAccount(seedPhrase, password);
+        await saveUserAccount(userAccount);
+        // Clear sensitive data from memory
+        setSeedPhrase('');
+        setWallet(null);
+        // Move to success screen
+        setStep('success');
       } catch (error) {
-        console.error('Error encrypting seed phrase:', error);
+        console.error('Error saving user account:', error);
         // Handle error (e.g., show error message to user)
       }
     }
   }, [wallet, seedPhrase, password]);
-
-  const handleSeedPhraseConfirmed = useCallback(() => {
-    setStep('success');
-  }, []);
 
   const handleBack = () => {
     switch (step) {
@@ -170,7 +163,7 @@ export function WalletSetup({ initialStep, onComplete, onBack, isFullScreen = fa
         )}
         {step === 'password' && (
           <PasswordSetup
-            onSetPassword={handleFinalPasswordSetup}
+            onSetPassword={handleSetPassword}
             currentStep={getCurrentStep()}
             totalSteps={getTotalSteps()}
           />

@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Checkbox } from './ui/checkbox';
 import { EyeIcon, EyeOffIcon, ClipboardCopyIcon } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 interface SeedPhraseDisplayProps {
   seedPhrase: string;
@@ -28,9 +29,12 @@ export function SeedPhraseDisplay({ seedPhrase, onContinue }: SeedPhraseDisplayP
   return (
     <div className="w-full max-w-md mx-auto text-white">
       <h2 className="text-2xl font-bold text-center mb-2">Your Secret Recovery Phrase</h2>
-      <p className="text-center text-gray-400 mb-6">
-        Write down these 12 words in order and keep them safe. You'll need them to recover your wallet.
-      </p>
+      <Alert variant="destructive" className="mb-4">
+        <AlertTitle>Important Security Information</AlertTitle>
+        <AlertDescription>
+          Your secret recovery phrase is the only way to recover your wallet. Write it down and store it in a secure location. Never share it with anyone.
+        </AlertDescription>
+      </Alert>
       <div 
         className="grid grid-cols-3 gap-2 mb-4 relative"
         onMouseEnter={() => setIsHovering(true)}
@@ -58,7 +62,7 @@ export function SeedPhraseDisplay({ seedPhrase, onContinue }: SeedPhraseDisplayP
             onCheckedChange={(checked) => setIsConfirmed(checked as boolean)}
           />
           <label htmlFor="confirm" className="text-sm text-gray-300">
-            I have written down my recovery phrase
+            I have securely stored my recovery phrase
           </label>
         </div>
         <Button 
